@@ -1,5 +1,5 @@
 import HeaderRightComponent from '../header-right/header-right.component';
-import simaLogo from 'assets/images/statics/sima-negative.svg';
+import mainLogo from 'assets/images/statics/LogoMain.png';
 import {useHeaderNavbarStyles} from './header-navbar.style';
 import {NavLink} from 'react-router-dom';
 import {Routes} from 'router/routes';
@@ -13,7 +13,7 @@ const HeaderNavbarComponent = () => {
                 <div className='col-8'>
                     <div className={classes.left}>
                         <NavLink to={Routes.default}>
-                            <img src={simaLogo} alt='logo'/>
+                            <img src={mainLogo} alt='logo'/>
                         </NavLink>
                     </div>
                 </div>

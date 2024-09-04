@@ -6,13 +6,14 @@ import sizes from 'assets/styles/abstracts/sizes';
 
 const styles = {
     leftMenu: {
+        
         borderRight: `2px solid ${colors.border}`,
         position: 'fixed',
         left: '0',
-        top: rem(sizes.leftMenuSpacing),
+        top: rem(sizes.leftMenuSpacing+25),
         width: rem(sizes.leftMenu),
         height: `calc(100vh - ${rem(sizes.leftMenuSpacing)})`,
-        backgroundColor: '#F1F2F3',
+        backgroundColor: '#FFF',
         padding: `${rem(20)} ${rem(15)}`,
         transition: transition(),
 

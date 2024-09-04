@@ -5,8 +5,9 @@ export const az = {
 
     // left menu
     home_title: 'Ana səhifə',
-    form_title: 'Form',
-    table_title: 'Cədvəl',
+    announcement_title: 'Elanlar',
+    quiz_title: 'Quizlər',
+    setting_title:'Tənzimləmələr',
 
     // errors
     input_required: 'Bu xana mütləqdir',

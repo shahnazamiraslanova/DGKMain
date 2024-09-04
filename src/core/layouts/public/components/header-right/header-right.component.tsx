@@ -1,12 +1,16 @@
 
 import {LogoutIcon} from 'assets/images/icons/logout';
 import {useHeaderRightStyles} from './header-right.style';
+import { Routes } from 'router/routes';
+import { useNavigate } from 'react-router-dom';
 
 const HeaderRightComponent = () => {
     const classes = useHeaderRightStyles();
+    const navigate=useNavigate();
 
     const logout = () => {
-        console.log('rest');
+      localStorage.clear();
+      navigate(Routes.login);
     };
 
     return (

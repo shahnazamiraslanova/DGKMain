@@ -42,10 +42,10 @@ const HeaderSubComponent = () => {
                 <LeftMenuToggle/>
             </div>
             <div>
-                <select name='select' id='select' onChange={changeLanguage} value={currentLang}>
+                <select className={classes.headerSubSelect} name='select' id='select' onChange={changeLanguage} value={currentLang}>
                     {
                         languages.map((item: ILanguages) => (
-                            <option value={item.key} key={generateGuid()}>{item.value}</option>
+                            <option  value={item.key} key={generateGuid()}>{item.value}</option>
                         ))
                     }
                     

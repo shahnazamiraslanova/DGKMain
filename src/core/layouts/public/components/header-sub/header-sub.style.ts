@@ -1,5 +1,5 @@
 import colors from 'assets/styles/abstracts/color';
-import {createUseStyles} from 'react-jss';
+import { createUseStyles } from 'react-jss';
 
 const styles = {
     sub: {
@@ -11,9 +11,19 @@ const styles = {
     },
     subItem: {
         display: 'flex',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        color:'#394e75'
     },
-    bars: {fontSize: '18px'}
+    headerSubSelect: {
+        border:"none",
+        backgroundColor:'#5a73a0',
+        color:'white',
+        borderRadius:'10px',
+        padding:'5px 10px',
+        outline:'none'
+
+    },
+    bars: { fontSize: '18px' }
 };
 
 export const useHeaderSubStyles = createUseStyles(styles);

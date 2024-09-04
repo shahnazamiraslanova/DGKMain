@@ -14,7 +14,7 @@ const LoginComponent = () => {
     const OTP_URL = 'https://c2c-fvaisoutbusiness.customs.gov.az:7546/api/Account/get-otp';
     const LOGIN_URL = 'https://c2c-fvaisoutbusiness.customs.gov.az:7546/api/Account/sign-in';
     const navigate = useNavigate();
-    const { panel, loginMain, logoImg, input, inputContainer, button, showPasswordButton, loginTitle } = useLoginStyles();
+    const { panel, loginMain, logoImg, input, inputContainer, button, showPasswordButton, loginTitle, sendAgain, sendAgainText } = useLoginStyles();
 
     const [showPassword, setShowPassword] = useState(false);
     const [showOtpForm, setShowOtpForm] = useState(false);
@@ -25,6 +25,7 @@ const LoginComponent = () => {
 
     const [usernameIsOk, setUsernameIsOk] = useState(true);
     const [passwordIsOk, setPasswordIsOk] = useState(true);
+    const [number, setNumber]=useState("");
 
     useEffect(() => {
         const storedUsername = getUsername();
@@ -47,16 +48,18 @@ const LoginComponent = () => {
                 if (response.data) {
                     localStorage.setItem('username', username);
                     setShowOtpForm(true);
-                    toast.success('OTP ssizə göndərildi!');
+                    // toast.success('OTP ssizə göndərildi!');
+                    setNumber(response.data.data);
+                    
                 } else {
-                    toast.error('İstifadəçi adı və ya şifrə yalnışdır');
+                    // toast.error('İstifadəçi adı və ya şifrə yalnışdır');
                 }
             } catch (error) {
 
-                toast.error('İstifadəçi adı və ya şifrə yalnışdır');
+                // toast.error('İstifadəçi adı və ya şifrə yalnışdır');
             }
         } else {
-            toast.error('İstifadəçi adı və şifrə boş qoyula bilməz');
+            // toast.error('İstifadəçi adı və şifrə boş qoyula bilməz');
         }
     }
 
@@ -80,19 +83,19 @@ const LoginComponent = () => {
                 if (response.data) {
                     localStorage.setItem("token", response.data.data);
                     setShowOtpForm(true);
-                    toast.success('Daxil oldunuz!');
+                    // toast.success('Daxil oldunuz!');
                     navigate(Routes.home);
                 } else {
-                    toast.error('Invalid username or password');
+                    // toast.error('Invalid username or password');
                 }
             } catch (error) {
 
-                toast.error('Invalid username or password');
+                // toast.error('Invalid username or password');
             }
 
-            toast.success('OTP verification successful!');
+            // toast.success('OTP verification successful!');
         } else {
-            toast.error('Please enter a valid 6-digit OTP');
+            // toast.error('Please enter a valid 6-digit OTP');
         }
     };
 
@@ -101,7 +104,9 @@ const LoginComponent = () => {
             <div className={loginMain}>
                 <img className={logoImg} src={logoMain} alt='Logo' />
                 <div className={panel}>
-                    <p className={loginTitle}>Enter OTP</p>
+                {number!=='' &&  <p>{number} nömrəsinə kod göndərildi</p>}
+                   
+                    <p className={loginTitle}> OTP-ni daxil edin</p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                         {otp.map((digit, index) => (
                             <input
@@ -117,8 +122,9 @@ const LoginComponent = () => {
                         ))}
                     </div>
                     <Button onClick={handleOtpSubmit} className={button}>
-                        Verify OTP
+                       Təsdiq Et
                     </Button>
+                    <p className={sendAgainText}>Kodu əldə etmədim, <button onClick={handleOtpSubmit} className={sendAgain}> yenidən göndər</button></p>
                 </div>
             </div>
         );
@@ -167,6 +173,7 @@ const LoginComponent = () => {
                         <Button onClick={loginFun} className={button} htmlType='submit'>
                             Daxil ol
                         </Button>
+                    
                     </div>
                 </Form>
             </div>

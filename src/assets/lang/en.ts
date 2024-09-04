@@ -5,8 +5,9 @@ export const en = {
 
     //left menu
     home_title: 'Home',
-    form_title: 'Form',
-    table_title: 'Table',
+    announcement_title: 'Announcements',
+    quiz_title: 'Quizes',
+    setting_title:'Settings',
 
     // errors
     input_required: 'This field is required',

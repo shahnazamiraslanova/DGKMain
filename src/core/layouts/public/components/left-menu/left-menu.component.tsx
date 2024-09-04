@@ -1,7 +1,7 @@
 import {memo} from 'react';
 import LeftMenuItemComponent from '../left-menu-item/left-menu-item.component';
 import {generateGuid} from 'core/helpers/generate-guid';
-import {HomeIcon} from 'assets/images/icons/left-menu';
+import {AnnouncementIcon, DocsIcon, HomeIcon, SettingIcon} from 'assets/images/icons/left-menu';
 import {Routes} from 'router/routes';
 import {useLeftMenuStyles} from './left-menu.style';
 import classNames from 'classnames';
@@ -18,29 +18,24 @@ const LeftMenuComponent = memo(({isOpen}: { isOpen: boolean }) => {
             name: translate('home_title'),
             link: Routes.home,
             icon: <HomeIcon/>,
-            submenu: [
-                {
-                    id: 1,
-                    link: Routes.home,
-                    name: 'test',
-                },
-                {
-                    id: 2,
-                    link: Routes.home,
-                    name: 'test2'
-                },
-            ]
+          
         },
         {
             id: 2,
-            name: translate('table_title'),
-            link: Routes.table,
-            icon: <HomeIcon/>,
+            name: translate('announcement_title'),
+            link: Routes.announcement,
+            icon: <AnnouncementIcon/>,
         }, {
             id: 3,
-            name: translate('form_title'),
-            link: Routes.form,
-            icon: <HomeIcon/>,
+            name: translate('quiz_title'),
+            link: Routes.quiz,
+            icon: <DocsIcon/>,
+        },
+        {
+            id: 4,
+            name: translate('setting_title'),
+            link: Routes.setting,
+            icon: <SettingIcon/>,
         }
     ];
 

@@ -2,9 +2,10 @@ export enum Routes {
     default = '/',
     auth = '/auth',
     home = '/',
-    table = '/table',
-    form = '/form',
+    announcement = '/announcement',
+    quiz = '/quiz',
     login = '/auth/login',
+    setting='/setting'
   
 }
 

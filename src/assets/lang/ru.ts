@@ -4,9 +4,10 @@ export const ru = {
     organisation: 'Azintelecom MMC',
 
     // left menu
-    home_page: 'Домашняя страница',
-    form_page: 'Форма',
-    table_page: 'Стол',
+    home_title: 'Домашняя страница',
+    announcement_title: 'Announcements',
+    quiz_title: 'Викторины',
+    setting_title:'Настройки',
 
     // errors
     required: 'Это поле обязательно к заполнению',

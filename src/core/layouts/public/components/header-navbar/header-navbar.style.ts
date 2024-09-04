@@ -4,14 +4,14 @@ import {createUseStyles} from 'react-jss';
 
 const styles = {
     navbar: {
-        backgroundColor: colors.darkBlue,
+        backgroundColor: "#394e75",
     },
     left: {
         display: 'flex',
         alignItems: 'center',
         '& img': {
             display: 'block',
-            width: rem(100),
+            width: "60px",
         }
     },
 };

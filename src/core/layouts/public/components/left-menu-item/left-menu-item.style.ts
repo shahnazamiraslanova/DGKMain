@@ -18,6 +18,7 @@ const styles = {
         padding: `${rem(10)} ${rem(5)} ${rem(10)} ${rem(15)}`,
         display: 'flex',
         justifyContent: 'space-between',
+        
 
         '&:hover': {
             backgroundColor: colors.paleHover,
@@ -59,8 +60,8 @@ const styles = {
     },
     itemText: {
         display: 'flex',
-        alignItems: 'center',
-        color: colors.paleBlue,
+        alignItems: 'center', 
+        color:'#394e75',
         fontFamily: fonts.fontBold,
         fontSize: rem(13),
         letterSpacing: '1px',
@@ -108,15 +109,8 @@ const styles = {
             }
         },
     },
-    arrow: {
-        '& svg': {
-            color: colors.paleBlue,
-            verticalAlign: 'middle',
-            width: '15px',
-            height: '15px',
-            transition: transition(),
-        }
-    },
+   
+    
     active: {}
 
 };

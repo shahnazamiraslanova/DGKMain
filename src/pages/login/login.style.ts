@@ -7,7 +7,7 @@ import { createUseStyles } from 'react-jss';
 const styles = {
     inputContainer: {
         marginBottom: 20,
-        position:"relative"
+        position: "relative"
     },
     loginMain: {
         backgroundColor: '#394e75',
@@ -17,23 +17,23 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         gap: '200px',
-        [breakpoint(1500)]: { 
+        [breakpoint(1500)]: {
             gap: '100px',
 
         },
-        [breakpoint(768)]: { 
-            flexDirection:'column',
+        [breakpoint(768)]: {
+            flexDirection: 'column',
             gap: '50px',
 
         },
-        
+
     },
-    loginTitle:{
-        textAlign:'center',
-        marginBottom:'10px',
-        fontSize:'30px',
-        color:'white',
-        fontWeight:'bold'
+    loginTitle: {
+        textAlign: 'center',
+        marginBottom: '10px',
+        fontSize: '30px',
+        color: 'white',
+        fontWeight: 'bold'
     },
     page: {
         minHeight: '100vh',
@@ -56,20 +56,20 @@ const styles = {
     subtitle: {
         fontSize: rem(16),
     },
-    logoImg:{
-        width:'25%',
-        [breakpoint(1500)]: { 
+    logoImg: {
+        width: '25%',
+        [breakpoint(1500)]: {
             width: '30%',
 
         },
     },
     panel: {
         width: '20%',
-        [breakpoint(1500)]: { 
+        [breakpoint(1500)]: {
             width: '30%',
 
         },
-        [breakpoint(768)]: { 
+        [breakpoint(768)]: {
             width: '70%',
 
 
@@ -77,15 +77,15 @@ const styles = {
         backgroundColor: 'transparent'
     },
     input: {
-        backgroundColor:"#5A73A0",
-        color:'white',
+        backgroundColor: "#5A73A0",
+        color: 'white',
         width: '100%',
         padding: '12px',
         borderRadius: 8,
         border: 'none',
         fontSize: 14,
-        '&::placeholder':{
-            color:'#BBCEE8'
+        '&::placeholder': {
+            color: '#BBCEE8'
 
         },
         '&:focus': {
@@ -95,9 +95,17 @@ const styles = {
     },
     button: {
         width: '100%',
-        backgroundColor:'#fdfe65',
-        color:'#516385',
-        fontWeight:'bold'
+        backgroundColor: '#fdfe65',
+        color: '#516385',
+        fontWeight: 'bold'
+    },
+    sendAgain: {
+        backgroundColor: 'transparent',
+        border: 'none',
+        fontSize:'16px',
+        fontWeight:'bold',
+        color:'#fdfe65',
+        cursor:'pointer'
     },
     showPasswordButton: {
         position: 'absolute',
@@ -108,6 +116,12 @@ const styles = {
         border: 'none',
         color: '#BBCEE8',
         cursor: 'pointer',
+    },
+    sendAgainText:{
+        marginTop:'15px',
+        fontSize:'16px',
+        color:'white'
+
     },
     or: { color: colors.authSubtitleText, },
     invalidField: { border: '1px solid ' + colors.validationErrorColor, },

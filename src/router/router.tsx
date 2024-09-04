@@ -1,13 +1,15 @@
 import {createBrowserRouter} from 'react-router-dom';
 import PublicComponent from 'core/layouts/public/public.component';
 import HomeComponent from 'pages/home/home.component';
-import FormComponent from 'pages/form/form.component';
-import TableComponent from 'pages/table/table.component';
+
 import {Routes} from './routes';
 import NotFound from 'pages/not-found/notfound.component';
 import AuthComponent from 'core/layouts/auth/auth.component';
 import LoginComponent from 'pages/login/login.component';
 import AuthProtectedComponent from './protected/auth-protected.component';
+import AnnouncementComponent from 'pages/announcements/announcements.component';
+import QuizesComponent from 'pages/quizes/quizes.component';
+import SettingsComponent from 'pages/settings/settings.component';
 
 
 const router = createBrowserRouter([
@@ -19,12 +21,16 @@ const router = createBrowserRouter([
                 element: <HomeComponent/>,
             },
             {
-                path: Routes.form,
-                element: <FormComponent/>,
+                path: Routes.announcement,
+                element: <AnnouncementComponent/>,
             },
             {
-                path: Routes.table,
-                element: <TableComponent/>,
+                path: Routes.quiz,
+                element: <QuizesComponent/>,
+            },
+            {
+                path: Routes.setting,
+                element: <SettingsComponent/>,
             }
         ],
     },

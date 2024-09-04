@@ -8,7 +8,7 @@ const styles = {
     content: {
         marginLeft: rem(sizes.leftMenu),
         minHeight: 'calc(100vh - 50px) !important',
-        padding: rem(110) +' '+ rem(20) +' '+ rem(0),
+        
         transition: transition(),
     },
     active: {marginLeft: 0,},
