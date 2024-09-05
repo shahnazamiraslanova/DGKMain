@@ -1,7 +1,7 @@
 export const az = {
     rights: 'Bütün hüquqlar qorunur',
     copyright: 'Copyright',
-    organisation: 'Azintelecom MMC',
+    organisation: 'DGK',
 
     // left menu
     home_title: 'Ana səhifə',

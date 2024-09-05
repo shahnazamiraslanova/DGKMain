@@ -7,7 +7,8 @@ export interface IState {
     locale: any;
     user: any | null;
     username:string,
-    password:string
+    password:string;
+    token: string;
 }
 
 

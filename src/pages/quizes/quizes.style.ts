@@ -17,7 +17,12 @@ const styles: Styles = {
     }
 
   },
-  quizContainer:{}
+  quizContainer:{},
+  quizsList:{
+    display:'flex',
+    flexDirection:'column',
+    
+  }
 
 };
 

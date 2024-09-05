@@ -17,7 +17,8 @@ const initialState: IState = {
     locale: az,
     user: null,
     username: '', // Initialize username
-    password: ''  // Initialize password
+    password: '',  // Initialize password
+    token: ''      // Initialize token
 };
 
 export const rootSlice = createSlice({
@@ -48,10 +49,13 @@ export const rootSlice = createSlice({
         },
         setPassword: (state: IState, action: PayloadAction<string>) => {
             state.password = action.payload;
+        },
+        setToken: (state: IState, action: PayloadAction<string>) => {
+            state.token = action.payload;  // Set the token in state
         }
     },
 });
 
-export const { setLoader, toggleLeftMenu, setLocale, setUser, setUsername, setPassword } = rootSlice.actions;
+export const { setLoader, toggleLeftMenu, setLocale, setUser, setUsername, setPassword, setToken } = rootSlice.actions;
 
 export default rootSlice.reducer;

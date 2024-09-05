@@ -1,7 +1,7 @@
 export const en = {
     rights: 'All rights reserved',
     copyright: 'Copyright',
-    organisation: 'Azintelecom MMC',
+    organisation: 'DGK',
 
     //left menu
     home_title: 'Home',

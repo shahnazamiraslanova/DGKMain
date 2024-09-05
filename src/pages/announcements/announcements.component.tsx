@@ -115,7 +115,7 @@ const AnnouncementManagement: React.FC = () => {
       <div className={classes.searchContainer}>
         <input
           type="text"
-          placeholder="Search announcements..."
+          placeholder="Elan axtar..."
           value={searchTerm}
           onChange={handleSearch}
           className={classes.searchInput}
@@ -124,38 +124,38 @@ const AnnouncementManagement: React.FC = () => {
       <div className={classes.formContainer}>
         <input
           type="text"
-          placeholder="Announcement Title"
+          placeholder="Elan başlığı"
           value={newAnnouncement.title}
           onChange={(e) => setNewAnnouncement({ ...newAnnouncement, title: e.target.value })}
           className={classes.input}
         />
         <textarea
-          placeholder="Announcement Body"
+          placeholder="Elan kontenti..."
           value={newAnnouncement.body}
           onChange={(e) => setNewAnnouncement({ ...newAnnouncement, body: e.target.value })}
           className={classes.textarea}
         />
         {editingId === null ? (
           <button onClick={handleAddAnnouncement} className={classes.button}>
-            Add Announcement
+           Elan əlavə et
           </button>
         ) : (
           <button onClick={handleUpdate} className={classes.button}>
-            Update Announcement
+           Elanı yebilə
           </button>
         )}
       </div>
       <div className={classes.controlsContainer}>
         <div className={classes.sortControls}>
           <button onClick={() => handleSort('date')} className={classes.sortButton}>
-            Sort by Date {sortKey === 'date' && (sortOrder === 'asc' ? '↑' : '↓')}
+            Tarixə görə sırala {sortKey === 'date' && (sortOrder === 'asc' ? '↑' : '↓')}
           </button>
           <button onClick={() => handleSort('title')} className={classes.sortButton}>
-            Sort by Title {sortKey === 'title' && (sortOrder === 'asc' ? '↑' : '↓')}
+            Başlığa görə sırala{sortKey === 'title' && (sortOrder === 'asc' ? '↑' : '↓')}
           </button>
         </div>
         <div className={classes.perPageControl}>
-          <label htmlFor="perPage">Items per page:</label>
+          <label htmlFor="perPage">Bir səhifə üçün elan sayı:</label>
           <select
             id="perPage"
             value={announcementsPerPage}
@@ -181,20 +181,20 @@ const AnnouncementManagement: React.FC = () => {
             </p>
             <div className={classes.actionButtons}>
               <button onClick={() => handleEdit(announcement.id)} className={classes.editButton}>
-                Edit
+                Düzəliş et
               </button>
               {deleteConfirmId === announcement.id ? (
                 <>
                   <button onClick={() => handleDelete(announcement.id)} className={classes.confirmDeleteButton}>
-                    Confirm Delete
+                   Təsdiqlə
                   </button>
                   <button onClick={() => setDeleteConfirmId(null)} className={classes.cancelDeleteButton}>
-                    Cancel
+                    Ləğv et
                   </button>
                 </>
               ) : (
                 <button onClick={() => setDeleteConfirmId(announcement.id)} className={classes.deleteButton}>
-                  Delete
+                  Sil
                 </button>
               )}
             </div>

@@ -1,7 +1,7 @@
 export const ru = {
     rights: 'Все права защищены',
     copyright: 'Copyright',
-    organisation: 'Azintelecom MMC',
+    organisation: 'DGK',
 
     // left menu
     home_title: 'Домашняя страница',

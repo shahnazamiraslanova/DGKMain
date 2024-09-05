@@ -3,7 +3,7 @@ import { Button, Form } from 'antd';
 import { useLoginStyles } from './login.style';
 import logoMain from '../../assets/images/statics/LogoMain.png';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUsername, setPassword } from 'store/store.reducer';
+import { setUsername, setPassword, setToken } from 'store/store.reducer';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { getUsername } from '../../core/helpers/get-token';
@@ -21,6 +21,8 @@ const LoginComponent = () => {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const username = useSelector((state: any) => state.username);
     const password = useSelector((state: any) => state.password);
+    const token = useSelector((state: any) => state.token);
+
     const dispatch = useDispatch();
 
     const [usernameIsOk, setUsernameIsOk] = useState(true);
@@ -82,6 +84,7 @@ const LoginComponent = () => {
 
                 if (response.data) {
                     localStorage.setItem("token", response.data.data);
+                    setToken(response.data.data);
                     setShowOtpForm(true);
                     // toast.success('Daxil oldunuz!');
                     navigate(Routes.home);
@@ -104,7 +107,7 @@ const LoginComponent = () => {
             <div className={loginMain}>
                 <img className={logoImg} src={logoMain} alt='Logo' />
                 <div className={panel}>
-                {number!=='' &&  <p>{number} nömrəsinə kod göndərildi</p>}
+                
                    
                     <p className={loginTitle}> OTP-ni daxil edin</p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
@@ -124,6 +127,7 @@ const LoginComponent = () => {
                     <Button onClick={handleOtpSubmit} className={button}>
                        Təsdiq Et
                     </Button>
+                    {number!=='' &&  <p className={sendAgainText}>******{number.slice(6)} nömrəsinə kod göndərildi</p>}
                     <p className={sendAgainText}>Kodu əldə etmədim, <button onClick={handleOtpSubmit} className={sendAgain}> yenidən göndər</button></p>
                 </div>
             </div>

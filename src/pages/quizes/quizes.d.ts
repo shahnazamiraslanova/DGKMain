@@ -1,4 +1,5 @@
-export interface IQuiz{
-    title:string,
-    quiestion:[]
-}
+
+export interface Quiz {
+    id: number;
+    title: string;
+  }
