@@ -18,10 +18,11 @@ const QuizsComponent = () => {
   const [isManageGroupModalVisible, setIsManageGroupModalVisible] = useState<boolean>(false);
   const [isQuestionFormVisible, setIsQuestionFormVisible] = useState<boolean>(false);
   const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);  
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [quizTitle, setQuizTitle] = useState<string>('');
   const [form] = Form.useForm();
-
+  const [questionByQuiz, setQuestionsByQuiz] = useState([]);
+  const [quesId, setQuesId] = useState();
   const token = localStorage.getItem('token');
 
   const getQuizzes = async () => {
@@ -32,7 +33,7 @@ const QuizsComponent = () => {
           'api-key': token || '',
         },
       });
-      setQuizzes(response.data.data);  
+      setQuizzes(response.data.data);
       console.log(response.data);
     } catch (error) {
       console.error('Failed to fetch quizzes:', error);
@@ -40,12 +41,12 @@ const QuizsComponent = () => {
   };
 
   const handleOk = async () => {
-    console.log(quizTitle);
+    // console.log(quizTitle);
     try {
       const token = localStorage.getItem('token') || '';
       const response = await axios.post(
         'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/CreateQuiz',
-        { title: quizTitle }, 
+        { title: quizTitle },
         {
           headers: {
             'accept': 'application/json',
@@ -53,23 +54,24 @@ const QuizsComponent = () => {
           },
         }
       );
-     
-        
-        console.log('Updated Quizzes:', response.data.data);
-      console.log(response.data);
-      console.log(quizzes);
-      // getQuizzes();
-      
-     
+
+
+      //   console.log('Updated Quizzes:', response.data.data);
+      // console.log(response.data);
+      // console.log(quizzes);
+      getQuizzes();
+      handleCancel();
+
+
     } catch (error) {
-      console.error('Failed to fetch quizzes:', error);
+      // console.error('Failed to fetch quizzes:', error);
     }
   };
-  
+
 
   useEffect(() => {
     getQuizzes();
-  }, [token]);  
+  }, [token]);
 
   const handleCancel = () => {
     setIsQuizModalVisible(false);
@@ -104,13 +106,45 @@ const QuizsComponent = () => {
     setEditTitle(title);
   };
 
+  const [activeKey, setActiveKey] = useState<string | string[]>([]);
+
+  const handlePanelChange = (key: string | string[]) => {
+    setActiveKey(key);
+
+    if (typeof key === 'string') {
+      // Single panel expanded
+      getQuestionsByQuizId(key);
+    } else if (Array.isArray(key)) {
+      // Multiple panels expanded
+      key.forEach(k => getQuestionsByQuizId(k));
+    }
+  };
+  const getQuestionsByQuizId = async (quizId: any) => {
+    try {
+      const response = await axios.get(`https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllQuestionByQuizId/${quizId}`, {
+        headers: {
+          'accept': 'application/json',
+          'api-key': token || '',
+        },
+
+      });
+      setQuestionsByQuiz(response.data.data);
+
+
+      // (response.data.data);  
+    } catch (error) {
+      console.log(error);
+
+    }
+  };
+
   const handleSaveClick = async (id: number) => {
-    const updatedTitle = editTitle; 
+    const updatedTitle = editTitle;
     try {
       const token = localStorage.getItem('token') || '';
       const response = await axios.put(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizTitle`, 
-        { id, title: updatedTitle }, 
+        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizTitle`,
+        { id, title: updatedTitle },
         {
           headers: {
             'accept': 'application/json',
@@ -118,25 +152,25 @@ const QuizsComponent = () => {
           },
         }
       );
-  
-      console.log('Update successful:', response.data);
-  
-      
+
+      // console.log('Update successful:', response.data);
+
+
       setQuizzes(prevQuizzes =>
         prevQuizzes?.map(quiz =>
           quiz.id === id ? { ...quiz, title: updatedTitle } : quiz
         )
       );
-  
-      
+
+
       setEditingQuizId(null);
       setEditTitle('');
     } catch (error) {
-      console.error('Failed to update quiz:', error);
-      
+      // console.error('Failed to update quiz:', error);
+
     }
   };
-  
+
 
   const handleCancelClick = () => {
     setEditingQuizId(null);
@@ -174,101 +208,106 @@ const QuizsComponent = () => {
         <Button onClick={showManageGroupModal}>Mövcud qrupları idarə et</Button>
       </div>
 
-      
-      <Collapse accordion>
-      { quizzes?.map((quiz: Quiz, index: number) => (
-        <Panel
-          key={index}
-          header={
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              {editingQuizId === quiz.id ? (
-                <>
-                  <Input
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    style={{ width: '60%', marginRight: '10px' }}
-                  />
-                  <Button
-                    type="primary"
-                    icon={<SaveOutlined />}
-                    onClick={() => handleSaveClick(quiz.id)}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    type="default"
-                    icon={<CloseOutlined />}
-                    onClick={handleCancelClick}
-                    style={{ marginLeft: '10px' }}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Input
-                    value={quiz.title}
-                    style={{ width: '60%', marginRight: '10px' }}
-                    readOnly
-                  />
-                  <Button
-                    type="primary"
-                    icon={<EditOutlined />}
-                    onClick={() => handleEditClick(quiz.id, quiz.title)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    // type="danger"
-                    icon={<DeleteOutlined />}
-                    onClick={() => handleDeleteClick(quiz.id)}
-                    style={{ marginLeft: '10px' }}
-                  >
-                    Delete
-                  </Button>
-                </>
-              )}
-            </div>
-          }
-        >
-           <Button type="primary" onClick={handleAddQuestionClick}>Sual əlavə et</Button>
 
-{isQuestionFormVisible && (
-  <>
-    <Form.Item
-      name="questionTitle"
-      label="Sual"
-      rules={[{ required: true, message: 'Zəhmət olmasa, sualı daxil edin' }]}
-    >
-      <Input placeholder="Sualı daxil edin..." />
-    </Form.Item>
+      <Collapse activeKey={activeKey}
+        onChange={handlePanelChange} accordion>
+        {quizzes?.map((quiz: Quiz, index: number) => (
+          <Panel
+            key={index}
+            header={
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {editingQuizId === quiz.id ? (
+                  <>
+                    <Input
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      style={{ width: '60%', marginRight: '10px' }}
+                    />
+                    <Button
+                      type="primary"
+                      icon={<SaveOutlined />}
+                      onClick={() => handleSaveClick(quiz.id)}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      type="default"
+                      icon={<CloseOutlined />}
+                      onClick={handleCancelClick}
+                      style={{ marginLeft: '10px' }}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Input
+                      value={quiz.title}
+                      style={{ width: '60%', marginRight: '10px' }}
+                      readOnly
+                    />
+                    <Button
+                      type="primary"
+                      icon={<EditOutlined />}
+                      onClick={() => handleEditClick(quiz.id, quiz.title)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      // type="danger"
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleDeleteClick(quiz.id)}
+                      style={{ marginLeft: '10px' }}
+                    >
+                      Delete
+                    </Button>
+                  </>
+                )}
+              </div>
+            }
+          >
+            <Button type="primary" onClick={handleAddQuestionClick}>Sual əlavə et</Button>
 
-    <Form.Item label="Cavab variantları">
-      <Radio.Group  value={correctAnswer}>
-        {[1, 2, 3, 4].map((value) => (
-          <Radio value={value} key={value}>
-            <Form.Item
-              name={`option${value}`}
-              rules={[{ required: true, message: `Zəhmət olmasa, ${value}-ci variantı daxil edin` }]}
-            >
-              <Input placeholder={`Variant ${value}`} />
-            </Form.Item>
-          </Radio>
+            {isQuestionFormVisible && (
+              <>
+                <Form.Item
+                  name="questionTitle"
+                  label="Sual"
+                  rules={[{ required: true, message: 'Zəhmət olmasa, sualı daxil edin' }]}
+                >
+                  <Input placeholder="Sualı daxil edin..." />
+                </Form.Item>
+
+                <Form.Item label="Cavab variantları">
+                  <Radio.Group value={correctAnswer}>
+                    {[1, 2, 3, 4].map((value) => (
+                      <Radio value={value} key={value}>
+                        <Form.Item
+                          name={`option${value}`}
+                          rules={[{ required: true, message: `Zəhmət olmasa, ${value}-ci variantı daxil edin` }]}
+                        >
+                          <Input placeholder={`Variant ${value}`} />
+                        </Form.Item>
+                      </Radio>
+                    ))}
+                  </Radio.Group>
+                </Form.Item>
+                <Button type="default" onClick={handleCloseFormClick} style={{ marginRight: '10px' }}>
+                  Close
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Save
+                </Button>
+              </>
+            )}
+            {
+              questionByQuiz.map((item: any) => {
+                return `<h1>${item.content}</h1>`;
+              })
+
+            }        </Panel>
         ))}
-      </Radio.Group>
-    </Form.Item>
-    <Button type="default" onClick={handleCloseFormClick} style={{ marginRight: '10px' }}>
-              Close
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Save
-            </Button>
-  </>
-)}
-          {/* Panel content */}
-        </Panel>
-      ))}
-    </Collapse>
+      </Collapse>
 
       <Modal
         title="Quiz Yarat"
@@ -285,7 +324,7 @@ const QuizsComponent = () => {
             <Input onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuizTitle(e.target.value)} placeholder="Quiz başlığı..." />
           </Form.Item>
 
-         
+
         </Form>
       </Modal>
 
@@ -304,7 +343,7 @@ const QuizsComponent = () => {
             </Form.Item>
 
             <Form.Item label="Cavab variantları">
-              <Radio.Group  value={correctAnswer}>
+              <Radio.Group value={correctAnswer}>
                 {[1, 2, 3, 4].map((value) => (
                   <Radio value={value} key={value}>
                     <Input placeholder={`Variant ${value}`} />
