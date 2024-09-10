@@ -5,7 +5,7 @@ export const ru = {
 
     // left menu
     home_title: 'Домашняя страница',
-    announcement_title: 'Announcements',
+    announcement_title: 'Объявления',
     quiz_title: 'Викторины',
     setting_title:'Настройки',
 

@@ -22,19 +22,25 @@ export const isTokenValid = (token: string): boolean => {
     if (!token) return false;
 
     try {
-        console.log("SHDJ");
-        
         const decodedToken = jwtDecode<JwtPayload>(token);
-        const currentTime = Date.now() / 1000; 
-        console.log(decodedToken.exp);
+        const currentTime = Date.now() / 1000; // Get current time in seconds
+        localStorage.setItem("inspectorId", decodedToken.inspectorId);
 
-        return decodedToken.exp/1000 > currentTime; 
+        if (decodedToken.exp < currentTime) {
+            // Token is expired, clear it from local storage
+            clearToken();
+            return false;
+        }
+
+        return true;
     } catch (e) {
-        return false; 
+        // If an error occurs while decoding the token, assume it's invalid
+        clearToken();
+        return false;
     }
 };
 
-// Function to clear the token (optional)
+// Function to clear the token
 export const clearToken = () => {
     localStorage.removeItem('token');
 };
