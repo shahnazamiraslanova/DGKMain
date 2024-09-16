@@ -1,1 +1,10 @@
 @import "assets/styles/style";
+:where(.css-dev-only-do-not-override-19a7szb).ant-collapse>.ant-collapse-item >.ant-collapse-header .ant-collapse-expand-icon{
+    height: 50px;
+}
+:where(.css-dev-only-do-not-override-19a7szb).ant-form{
+    width: 100%;
+}
+*{
+    flex-wrap: wrap;
+}

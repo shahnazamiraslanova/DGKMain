@@ -23,24 +23,24 @@ export const isTokenValid = (token: string): boolean => {
 
     try {
         const decodedToken = jwtDecode<JwtPayload>(token);
-        const currentTime = Date.now() / 1000; // Get current time in seconds
+        const currentTime = Date.now() / 1000; 
         localStorage.setItem("inspectorId", decodedToken.inspectorId);
 
         if (decodedToken.exp < currentTime) {
-            // Token is expired, clear it from local storage
             clearToken();
             return false;
         }
 
         return true;
     } catch (e) {
-        // If an error occurs while decoding the token, assume it's invalid
         clearToken();
         return false;
     }
 };
 
-// Function to clear the token
 export const clearToken = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('inspectorId');
+
 };

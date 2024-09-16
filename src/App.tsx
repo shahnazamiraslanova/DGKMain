@@ -18,12 +18,12 @@ function App() {
     const loader = useStore('loader');
     useEffect(() => {
         const token = getToken();
-        const currentPath = window.location.pathname; // Get the current route
+        const currentPath = window.location.pathname; 
     
-        // Check if token is invalid and we're not already on the login page
+       
         if ((!token || !isTokenValid(token)) && currentPath !== '/auth/login') {
             clearToken();
-            window.location.href = "/auth/login"; // Redirect to login
+            window.location.href = "/auth/login"; 
         }
     }, []);
     
