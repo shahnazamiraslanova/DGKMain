@@ -16,9 +16,9 @@ const initialState: IState = {
     ],
     locale: az,
     user: null,
-    username: '', // Initialize username
-    password: '',  // Initialize password
-    token: ''      // Initialize token
+    username: '', 
+    password: '',  
+    token: ''     
 };
 
 export const rootSlice = createSlice({

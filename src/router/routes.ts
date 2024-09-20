@@ -5,6 +5,7 @@ export enum Routes {
     announcement = '/announcement',
     quiz = '/quiz',
     login = '/auth/login',
+    poll='/poll',
     setting='/setting'
   
 }

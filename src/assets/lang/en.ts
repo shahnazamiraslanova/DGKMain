@@ -7,6 +7,8 @@ export const en = {
     home_title: 'Home',
     announcement_title: 'Announcements',
     quiz_title: 'Quizes',
+    poll_title:'Polls',
+
     setting_title:'Settings',
 
     // errors

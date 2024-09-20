@@ -7,6 +7,7 @@ export const az = {
     home_title: 'Ana səhifə',
     announcement_title: 'Elanlar',
     quiz_title: 'Quizlər',
+    poll_title:'Sorğular',
     setting_title:'Tənzimləmələr',
 
     // errors

@@ -32,6 +32,7 @@ import {
   ISelectedUser,
   IUser,
 } from "./quizes";
+import { setServers } from "dns/promises";
 
 const QuizsComponent: React.FC = () => {
   const classes = useQuizStyles();
@@ -47,6 +48,8 @@ const QuizsComponent: React.FC = () => {
   const [isQuizModalVisible, setIsQuizModalVisible] = useState(false);
   const [isGroupModalVisible, setIsGroupModalVisible] = useState(false);
   const [isManageGroupModalVisible, setIsManageGroupModalVisible] =
+    useState(false);
+  const [isSeeResultsModalVisible, setIsSeeResultsModalVisible] =
     useState(false);
   const [isAssignQuizModalVisible, setIsAssignQuizModalVisible] =
     useState(false);
@@ -254,6 +257,7 @@ const QuizsComponent: React.FC = () => {
       setQuizzes((prevQuizzes) => [response.data.data, ...prevQuizzes]);
       handleCancel();
       setQuizTitle("");
+      form.resetFields();
     } catch (error) {
       console.error("Failed to create quiz:", error);
     }
@@ -579,6 +583,7 @@ const QuizsComponent: React.FC = () => {
     }
     setIsAssignQuizModalVisible(false);
     setQuizTitle("");
+    form.resetFields();
   };
 
   const handleEditClick = (
@@ -691,6 +696,12 @@ const QuizsComponent: React.FC = () => {
           onClick={() => setIsManageGroupModalVisible(true)}
         >
           Mövcud qrupları idarə et
+        </Button>
+        <Button
+          className={classes.btn}
+          onClick={() => setIsSeeResultsModalVisible(true)}
+        >
+          Nəticələri gör
         </Button>
       </div>
 
@@ -1254,7 +1265,7 @@ const QuizsComponent: React.FC = () => {
                     marginTop: "10px",
                   }}
                 >
-                  <h3>{quiz.quizes[0].title}</h3>
+                  <h3>{quiz.quizes.title + quiz.id}</h3>
                   <Button
                     onClick={() => {
                       deleteGenaratedQuiz(quiz.id);
@@ -1358,6 +1369,20 @@ const QuizsComponent: React.FC = () => {
           </div>
         ))}
       </Modal>
+      <Modal
+        title="Nəticələr"
+        // onOk={() => handleRemoveUser(selectedGroup)}
+        visible={isSeeResultsModalVisible}
+        onCancel={() => setIsSeeResultsModalVisible(false)}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => setIsSeeResultsModalVisible(false)}
+          >
+            Bağla
+          </Button>,
+        ]}
+      ></Modal>
     </div>
   );
 };

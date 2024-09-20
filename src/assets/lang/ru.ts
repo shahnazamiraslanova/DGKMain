@@ -7,6 +7,7 @@ export const ru = {
     home_title: 'Домашняя страница',
     announcement_title: 'Объявления',
     quiz_title: 'Викторины',
+    poll_title:'Oпросы',
     setting_title:'Настройки',
 
     // errors

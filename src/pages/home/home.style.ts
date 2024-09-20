@@ -6,7 +6,13 @@ import { createUseStyles } from 'react-jss';
 
 const styles = {
     homeMain:{
-        margin:'150px 40px 0 40px '
+        margin:'150px 40px 0 40px ',
+        display:'flex',
+        // width:'100%'
+        
+    },
+    adminInfo:{
+
     }
     
 };

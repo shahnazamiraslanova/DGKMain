@@ -1,7 +1,7 @@
 import {memo} from 'react';
 import LeftMenuItemComponent from '../left-menu-item/left-menu-item.component';
 import {generateGuid} from 'core/helpers/generate-guid';
-import {AnnouncementIcon, DocsIcon, HomeIcon, SettingIcon} from 'assets/images/icons/left-menu';
+import {AnnouncementIcon, DocsIcon, HomeIcon, PollIcon, SettingIcon} from 'assets/images/icons/left-menu';
 import {Routes} from 'router/routes';
 import {useLeftMenuStyles} from './left-menu.style';
 import classNames from 'classnames';
@@ -29,10 +29,17 @@ const LeftMenuComponent = memo(({isOpen}: { isOpen: boolean }) => {
             id: 3,
             name: translate('quiz_title'),
             link: Routes.quiz,
+           
             icon: <DocsIcon/>,
         },
         {
             id: 4,
+            name: translate('poll_title'),
+            link: Routes.poll,
+            icon: <PollIcon/>,
+        },
+        {
+            id: 5,
             name: translate('setting_title'),
             link: Routes.setting,
             icon: <SettingIcon/>,
