@@ -12,6 +12,7 @@ import {
   Select,
   Table,
   Switch,
+  Checkbox,
 } from "antd";
 import axios from "axios";
 import {
@@ -38,7 +39,8 @@ const QuizsComponent: React.FC = () => {
   const classes = useQuizStyles();
   const { Panel } = Collapse;
   const { confirm } = Modal;
-  const [form] = Form.useForm();
+  const [quizForm] = Form.useForm();
+  const [questionForm] = Form.useForm();
   const [groupForm] = Form.useForm();
   const [assignQuizForm] = Form.useForm();
   const token = localStorage.getItem("token");
@@ -93,8 +95,26 @@ const QuizsComponent: React.FC = () => {
   const [selectedGroupMembers, setSelectedGroupMembers] = useState([]);
   const [groupMembersToRemove, setGroupMemberstoRemove] = useState<any>([]);
   const [genaratedQuizes, setGenaratedQuizes] = useState([]);
+  const [quizResults, setQuizResults] = useState([]);
 
   // GET REQUESTS
+  const fetchQuizResults = async (quizId: number) => {
+    try {
+      const response = await axios.get(
+        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllUserResultByGeneratedQuizId/${quizId}`,
+        {
+          headers: {
+            accept: "application/json",
+            "api-key": token || "",
+          },
+        }
+      );
+      setQuizResults(response.data.data);
+    } catch (error) {
+      console.error("Failed to fetch quiz results:", error);
+      message.error("Nəticələri əldə etmək mümkün olmadı");
+    }
+  };
   const getQuizzes = useCallback(async () => {
     try {
       const response = await axios.get(
@@ -155,7 +175,7 @@ const QuizsComponent: React.FC = () => {
   useEffect(() => {
     getQuizzes();
     getGroups();
-  }, [getQuizzes, getGroups]);
+  }, [getQuizzes, getGroups, newTitle]);
 
   const getQuestionsByQuizId = async (quizId: number) => {
     setLoadingQuestions((prev) => ({ ...prev, [quizId]: true }));
@@ -234,18 +254,19 @@ const QuizsComponent: React.FC = () => {
   };
 
   // POST REQUESTS
+
   const handleOk = async () => {
     try {
-      const values = await form.validateFields();
+      const values = await quizForm.validateFields();
 
-      if (!quizTitle || quizTitle.trim() === "") {
+      if (!values.quizTitle || values.quizTitle.trim() === "") {
         console.error("Quiz title cannot be empty");
         return;
       }
 
       const response = await axios.post(
         "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/CreateQuiz",
-        { title: quizTitle },
+        { title: values.quizTitle },
         {
           headers: {
             accept: "application/json",
@@ -256,8 +277,7 @@ const QuizsComponent: React.FC = () => {
 
       setQuizzes((prevQuizzes) => [response.data.data, ...prevQuizzes]);
       handleCancel();
-      setQuizTitle("");
-      form.resetFields();
+      quizForm.resetFields();
     } catch (error) {
       console.error("Failed to create quiz:", error);
     }
@@ -265,13 +285,11 @@ const QuizsComponent: React.FC = () => {
 
   const handleAddQuestion = async (quizId: number) => {
     try {
-      const values = await form.validateFields();
-      const options = [
-        { isTrue: values.correctOption === 1, content: values.option1 },
-        { isTrue: values.correctOption === 2, content: values.option2 },
-        { isTrue: values.correctOption === 3, content: values.option3 },
-        { isTrue: values.correctOption === 4, content: values.option4 },
-      ];
+      const values = await questionForm.validateFields();
+      const options = [1, 2, 3, 4].map((value) => ({
+        isTrue: values.correctOption === value,
+        content: values[`option${value}`],
+      }));
 
       const response = await axios.post(
         "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/CreateQuizQuestionAndAnswers",
@@ -288,10 +306,12 @@ const QuizsComponent: React.FC = () => {
         }
       );
 
-      getQuestionsByQuizId(quizId);
+      await getQuestionsByQuizId(quizId);
       message.success("Sual əlavə olundu");
-      form.resetFields();
+      questionForm.resetFields();
+      setOpenQuestionForms((prev) => ({ ...prev, [quizId]: false }));
     } catch (error) {
+      console.error("Error adding question:", error);
       message.error("Sual əlavə oluna bilmədi");
     }
   };
@@ -302,7 +322,7 @@ const QuizsComponent: React.FC = () => {
         "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GenerateQuiz",
         {
           id: selectedQuiz,
-          userId: localStorage.getItem("inspectorId"),
+          // userId: localStorage.getItem("inspectorId"),
           groupId: selectedGroup,
           duration: values.duration,
           isImportant: values.isImportant,
@@ -382,9 +402,38 @@ const QuizsComponent: React.FC = () => {
     }
   };
 
+
+
+  const handleEditQuizGroupTitle = async ( id: number) => {
+    // console.log(id);
+    // console.log(localStorage.getItem("ispectorId"));
+    
+    // console.log(newTitle);
+    
+    
+    try {
+      await axios.put(
+        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizGroupTitle`,
+        { id, title: newTitle },
+        {
+          headers: {
+            accept: "application/json",
+            "api-key": token || "",
+          },
+        }
+      );
+
+     
+     
+    } catch (error) {
+      console.error("Failed to update quiz:", error);
+    }
+  };
+
+
   const handleEditQuestion = async (questionId: number, quizId: number) => {
     try {
-      const values = await form.validateFields();
+      const values = await questionForm.validateFields();
       const options = [
         { isTrue: values.correctOption === 1, content: values.option1 },
         { isTrue: values.correctOption === 2, content: values.option2 },
@@ -427,7 +476,8 @@ const QuizsComponent: React.FC = () => {
     quizId: number
   ) => {
     try {
-      const values = await form.validateFields();
+      const values = await questionForm.validateFields();
+
       const response = await axios.put(
         "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizQuestionAnswer",
         {
@@ -444,16 +494,28 @@ const QuizsComponent: React.FC = () => {
         }
       );
 
+      const updatedOption = response.data.data;
+
       setOptionsByQuestion((prev) => ({
         ...prev,
         [questionId]: prev[questionId].map((o) =>
-          o.id === optionId ? response.data.data : o
+          o.id === optionId
+            ? {
+                ...o,
+                content: updatedOption.content,
+                isTrue: updatedOption.isTrue,
+              }
+            : { ...o, isTrue: values.isCorrect ? false : o.isTrue }
         ),
       }));
 
       message.success("Seçim redaktə olundu");
       setEditingOptionId(null);
+
+      // Refresh the questions for this quiz
+      await getQuestionsByQuizId(quizId);
     } catch (error) {
+      console.error("Error editing option:", error);
       message.error("Seçim redaktə oluna bilmədi");
     }
   };
@@ -519,11 +581,15 @@ const QuizsComponent: React.FC = () => {
   };
 
   const handleRemoveUser = async (groupId: any) => {
+
+    console.log(groupId, groupMembersToRemove);
+    
     try {
       await axios.delete(
         `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/DeleteQuizGroupMember`,
         {
           data: {
+            // userId:localStorage.getItem('inspectorId'),
             groupId: groupId,
             quizGroupMemberIds: groupMembersToRemove,
           },
@@ -533,6 +599,7 @@ const QuizsComponent: React.FC = () => {
           },
         }
       );
+      setGroupMemberstoRemove([]);
 
       // Assuming 'id' refers to the quiz group member ID you want to remove from the state
     } catch (error) {
@@ -562,6 +629,31 @@ const QuizsComponent: React.FC = () => {
   };
 
   //HELPER FUNCTIONS
+
+
+
+  function findCommonElements(arr1:any, arr2:any) {
+    const set1 = new Set(arr1); // Convert the first array to a Set
+    const commonElements = arr2.filter((item:any) => set1.has(item)); // Find common elements
+  
+    return commonElements;
+  }
+  
+  // Example usage
+
+  
+  // const common = findCommonElements(arr1, arr2);
+  // if (common.length > 0) {
+  //   console.log("Common elements:", common); // Output: Common elements: [4, 5]
+  // } else {
+  //   console.log("No common elements found.");
+  // }
+  
+
+
+
+
+
   const handlePanelChange = (key: string | string[]) => {
     setActiveKey(key);
     if (typeof key === "string") {
@@ -575,6 +667,9 @@ const QuizsComponent: React.FC = () => {
     getOptionsByQuestionId(questionId);
   };
 
+
+  
+
   const handleCancel = () => {
     setIsQuizModalVisible(false);
     setIsGroupModalVisible(false);
@@ -583,7 +678,10 @@ const QuizsComponent: React.FC = () => {
     }
     setIsAssignQuizModalVisible(false);
     setQuizTitle("");
-    form.resetFields();
+    quizForm.resetFields();
+    questionForm.resetFields();
+    groupForm.resetFields();
+    assignQuizForm.resetFields();
   };
 
   const handleEditClick = (
@@ -602,14 +700,17 @@ const QuizsComponent: React.FC = () => {
     setEditTitle("");
   };
 
-  const showConfirmDialog = (values: any) => {
+  const showConfirmDialog = (content: any, ourFunction:()=>void) => {
+    
+    
     confirm({
-      title: "Bu adı daşıyan qrup artıq var",
-      content: "Yenə də yaratmaq istəyirsiniz?",
+      // title: "Bu adı daşıyan qrup artıq var",
+      content: content,
       okText: "Bəli",
       cancelText: "Xeyr",
       onOk() {
-        proceedWithGroupCreation(values);
+        // proceedWithGroupCreation(values);
+        ourFunction();
       },
     });
   };
@@ -620,7 +721,7 @@ const QuizsComponent: React.FC = () => {
     );
 
     if (isThisNameExist) {
-      showConfirmDialog(values);
+      showConfirmDialog("Bu adda qrup artıq var,yenə də yaratmaq istəyirsiniz?", ()=> proceedWithGroupCreation(values));
     } else {
       proceedWithGroupCreation(values);
     }
@@ -649,6 +750,7 @@ const QuizsComponent: React.FC = () => {
   const handleAddUser = () => {
     setIsAddUserModalVisible(true);
   };
+
   const handleManageUsers = () => {
     setIsManageUsersModalVisible(true);
   };
@@ -660,6 +762,7 @@ const QuizsComponent: React.FC = () => {
         "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizGroupMember",
         {
           groupId: groupId,
+          // userId:localStorage.getItem("inspectorId"),
           quizGroupMemberIds: quizGroupMemberIds,
         },
         {
@@ -753,7 +856,7 @@ const QuizsComponent: React.FC = () => {
                     </Button>
                     <Button
                       icon={<DeleteOutlined />}
-                      onClick={(e) => handleDeleteClick(e, quiz.id)}
+                      onClick={(e) => showConfirmDialog("Silmək istədiyinizə əminsiniz?", handleDeleteClick(e, quiz.id))}
                       className={`${classes.btn} ${classes.actionBtn}`}
                     >
                       Sil
@@ -776,7 +879,7 @@ const QuizsComponent: React.FC = () => {
             {openQuestionForms[quiz.id] && (
               <div className={classes.questionForm}>
                 <Form
-                  form={form}
+                  form={questionForm}
                   layout="vertical"
                   onFinish={() => handleAddQuestion(quiz.id)}
                 >
@@ -814,16 +917,18 @@ const QuizsComponent: React.FC = () => {
                     </Radio.Group>
                   </Form.Item>
                   <Button
-                    onClick={() =>
+                    onClick={() => {
+                      handleCancel(); // Call the function
                       setOpenQuestionForms((prev) => ({
                         ...prev,
                         [quiz.id]: false,
-                      }))
-                    }
+                      }));
+                    }}
                     style={{ marginRight: "10px" }}
                   >
                     Ləğv et
                   </Button>
+
                   <Button type="primary" htmlType="submit">
                     Saxla
                   </Button>
@@ -848,7 +953,7 @@ const QuizsComponent: React.FC = () => {
                         >
                           {editingQuestionId === question.id ? (
                             <Form
-                              form={form}
+                              form={questionForm}
                               layout="vertical"
                               onFinish={() =>
                                 handleEditQuestion(question.id, quiz.id)
@@ -869,7 +974,7 @@ const QuizsComponent: React.FC = () => {
                               </Form.Item>
                               <Button
                                 icon={<SaveOutlined />}
-                                onClick={() => form.submit()}
+                                onClick={() => questionForm.submit()}
                                 className={`${classes.btn} ${classes.actionBtn}`}
                               >
                                 Saxla
@@ -922,7 +1027,7 @@ const QuizsComponent: React.FC = () => {
                               >
                                 {editingOptionId === option.id ? (
                                   <Form
-                                    form={form}
+                                    form={questionForm}
                                     layout="inline"
                                     onFinish={() =>
                                       handleEditOption(
@@ -941,20 +1046,18 @@ const QuizsComponent: React.FC = () => {
                                           message: "Seçim daxil edin",
                                         },
                                       ]}
-                                      initialValue={option.content}
                                     >
                                       <Input />
                                     </Form.Item>
                                     <Form.Item
                                       name="isCorrect"
                                       valuePropName="checked"
-                                      initialValue={option.isTrue}
                                     >
-                                      <Radio>Düzgünlük</Radio>
+                                      <Checkbox>Düzgünlük</Checkbox>
                                     </Form.Item>
                                     <Button
                                       icon={<SaveOutlined />}
-                                      onClick={() => form.submit()}
+                                      onClick={() => questionForm.submit()}
                                       className={`${classes.btn} ${classes.actionBtn}`}
                                     >
                                       Saxla
@@ -972,14 +1075,20 @@ const QuizsComponent: React.FC = () => {
                                     <span className={classes.optionContent}>
                                       {option.content}
                                     </span>
+                                    {/* Make sure Radio reflects the updated state */}
                                     <Radio checked={option.isTrue} disabled>
                                       Düzgünlük
                                     </Radio>
                                     <Button
                                       icon={<EditOutlined />}
-                                      onClick={() =>
-                                        setEditingOptionId(option.id)
-                                      }
+                                      onClick={() => {
+                                        setEditingOptionId(option.id);
+                                        // Set form values when entering edit mode
+                                        questionForm.setFieldsValue({
+                                          optionContent: option.content,
+                                          isCorrect: option.isTrue,
+                                        });
+                                      }}
                                       className={`${classes.btn} ${classes.actionBtn}`}
                                     >
                                       Redaktə et
@@ -1009,7 +1118,7 @@ const QuizsComponent: React.FC = () => {
         okText="Yarat"
         cancelText="Ləğv et"
       >
-        <Form form={form} layout="vertical">
+        <Form form={quizForm} layout="vertical">
           <Form.Item
             name="quizTitle"
             label="Quiz başlığı"
@@ -1108,6 +1217,7 @@ const QuizsComponent: React.FC = () => {
                       setSelectedGroup(record.id);
                       getMembers(record.id);
                       setIsEditGroupModalVisible(true);
+                      setNewTitle(record.title);
                     }}
                     className={`${classes.btn} ${classes.actionBtn}`}
                   >
@@ -1213,14 +1323,15 @@ const QuizsComponent: React.FC = () => {
         footer={[
           <Button
             key="cancel"
-            onClick={() => setIsEditGroupModalVisible(false)}
+            onClick={() =>{setNewTitle(""); 
+              setIsEditGroupModalVisible(false);}}
           >
             Ləğv et
           </Button>,
           <Button
             key="save"
             type="primary"
-            onClick={() => setIsEditGroupModalVisible(false)}
+            onClick={() =>{setNewTitle(""); handleEditQuizGroupTitle(selectedGroup); setIsEditGroupModalVisible(false);}}
           >
             Saxla
           </Button>,
@@ -1291,7 +1402,17 @@ const QuizsComponent: React.FC = () => {
             key="save"
             type="primary"
             onClick={() => {
+              console.log(selectedGroup, selectedGroupMembers);
+              
+              // console.log(findCommonElements(selectedGroup, users));
+              
+
+              // if (group) {
+                
+              // }
               handleSaveNewUsers(selectedGroup);
+              // newTitle("") 
+              // users("");
             }}
           >
             Saxla
@@ -1383,6 +1504,36 @@ const QuizsComponent: React.FC = () => {
           </Button>,
         ]}
       ></Modal>
+      <Modal
+        title="Nəticələr"
+        visible={isSeeResultsModalVisible}
+        onCancel={() => setIsSeeResultsModalVisible(false)}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => setIsSeeResultsModalVisible(false)}
+          >
+            Bağla
+          </Button>,
+        ]}
+      >
+        <Table
+          dataSource={quizResults}
+          columns={[
+            {
+              title: "İstifadəçi",
+              dataIndex: "userName",
+              key: "userName",
+            },
+            {
+              title: "Nəticə",
+              dataIndex: "score",
+              key: "score",
+            },
+            // Add more columns as needed
+          ]}
+        />
+      </Modal>
     </div>
   );
 };
