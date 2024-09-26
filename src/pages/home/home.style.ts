@@ -1,20 +1,73 @@
-import colors from 'assets/styles/abstracts/color';
-// import { rem } from 'assets/styles/abstracts/functions';
-// import { breakpoint } from 'assets/styles/abstracts/mixins';
-
-import { createUseStyles } from 'react-jss';
+import { createUseStyles } from "react-jss";
 
 const styles = {
-    homeMain:{
-        margin:'150px 40px 0 40px ',
-        display:'flex',
-        // width:'100%'
-        
+    homeMain: {
+      margin: '150px 40px 0 40px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      gap: '30px',
     },
-    adminInfo:{
-
-    }
-    
-};
-
-export const useHomeStyle = createUseStyles(styles);
+    guidesMain: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      width: '30%',
+      '& h2': {
+        fontSize: '30px',
+        fontWeight: 'bold',
+        color: '#394E75',
+        marginBottom: '20px',
+      },
+    },
+    adminInfo: {
+      width: '50%',
+    },
+    guides: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      width: '80%',
+      alignItems: 'center',
+    },
+    eachGuide: {
+      width: '100%',
+      borderRadius: '8px',
+      padding: '20px 0',
+      border: 'none',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '20px',
+      backgroundColor: '#394E75',
+      color: 'white',
+      fontSize: '20px',
+    },
+  
+    adminDetailBox: {
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: '15px',
+      backgroundColor: '#f9f9f9',
+      padding: '20px',
+      borderRadius: '8px',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+      marginTop: '20px',
+    },
+    adminDetailItem: {
+      backgroundColor: '#e9ecef',
+      padding: '15px',
+      borderRadius: '5px',
+      color: '#394E75',
+      fontSize: '16px',
+      fontWeight: '500',
+    },
+    adminLabel: {
+      fontWeight: 'bold',
+      color: '#394E75',
+      fontSize: '16px',
+      marginBottom: '5px',
+    },
+  };
+  
+  export const useHomeStyle = createUseStyles(styles);
+  

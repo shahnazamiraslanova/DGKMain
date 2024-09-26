@@ -404,11 +404,8 @@ const QuizsComponent: React.FC = () => {
 
 
 
-  const handleEditQuizGroupTitle = async ( id: number) => {
-    // console.log(id);
-    // console.log(localStorage.getItem("ispectorId"));
-    
-    // console.log(newTitle);
+  const handleEditQuizGroupTitle = async ( id: number | null) => {
+   
     
     
     try {
@@ -856,7 +853,7 @@ const QuizsComponent: React.FC = () => {
                     </Button>
                     <Button
                       icon={<DeleteOutlined />}
-                      onClick={(e) => showConfirmDialog("Silmək istədiyinizə əminsiniz?", handleDeleteClick(e, quiz.id))}
+                      onClick={(e) => showConfirmDialog("Silmək istədiyinizə əminsiniz?", () => handleDeleteClick(e, quiz.id))}
                       className={`${classes.btn} ${classes.actionBtn}`}
                     >
                       Sil

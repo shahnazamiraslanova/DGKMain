@@ -9,3 +9,12 @@ export interface IFormValues {
     language: string;
     languages: string[];
 }
+// src/interfaces.ts
+export interface Announcement {
+    id: number;
+    title: string;
+    content: string;
+    createdDate: string;
+    files?: string[]; // Optional, adjust as necessary
+  }
+  

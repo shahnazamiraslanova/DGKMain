@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { createUseStyles } from 'react-jss';
 import styles from './announcements.style';
+import axios from 'axios';
+import { message } from 'antd';
 
 interface Announcement {
   id: number;
   title: string;
-  body: string;
-  date: Date;
+  content: string;
+  createdDate: Date;
+  files: [number]
 }
 
 const useStyles = createUseStyles(styles);
@@ -15,24 +18,38 @@ const AnnouncementManagement: React.FC = () => {
   const classes = useStyles();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [newAnnouncement, setNewAnnouncement] = useState({
+    title: '',
+    content: '',
+    image: null as File | null,
+  });  
   const [currentPage, setCurrentPage] = useState(1);
   const [announcementsPerPage, setAnnouncementsPerPage] = useState(5);
   const [sortKey, setSortKey] = useState<'date' | 'title'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
-  useEffect(() => {
-    // Load fake data
-    const fakeData: Announcement[] = Array.from({ length: 50 }, (_, index) => ({
-      id: index + 1,
-      title: `Announcement ${index + 1}`,
-      body: `This is the body of announcement ${index + 1}. It contains important information for all users.`,
-      date: new Date(Date.now() - Math.floor(Math.random() * 10000000000))
-    }));
-    setAnnouncements(fakeData);
-  }, []);
+  const token = localStorage.getItem('token');
+
+  const getHeaders = () => ({
+    accept: "application/json",
+    "api-key": token || "",
+  });
+
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await axios.get(
+        'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Accouncements/GetAnnouncemets',
+        { headers: getHeaders() }
+      );
+      setAnnouncements(response.data.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Failed to fetch announcements:", error);
+      message.error("Elanları əldə etmək mümkün olmadı");
+    }
+  };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -51,55 +68,119 @@ const AnnouncementManagement: React.FC = () => {
   const filteredAndSortedAnnouncements = announcements
     .filter((announcement) =>
       announcement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      announcement.body.toLowerCase().includes(searchTerm.toLowerCase())
+      announcement.content.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
       if (sortKey === 'date') {
-        return sortOrder === 'asc' ? a.date.getTime() - b.date.getTime() : b.date.getTime() - a.date.getTime();
+        return sortOrder === 'asc' ? new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime() : new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime();
       } else {
         return sortOrder === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title);
       }
     });
 
-  const handleAddAnnouncement = () => {
-    if (newAnnouncement.title && newAnnouncement.body) {
-      setAnnouncements([
-        { ...newAnnouncement, id: Date.now(), date: new Date() },
-        ...announcements,
-      ]);
-      setNewAnnouncement({ title: '', body: '' });
-      setCurrentPage(1);
+  const handleAddAnnouncement = async () => {
+    const formData = new FormData();
+    formData.append('title', newAnnouncement.title);
+    formData.append('content', newAnnouncement.content);
+    
+    if (newAnnouncement.image) {
+      formData.append('files', newAnnouncement.image);
     }
-  };
 
-  const handleEdit = (id: number) => {
-    setEditingId(id);
-    const announcementToEdit = announcements.find((a) => a.id === id);
-    if (announcementToEdit) {
-      setNewAnnouncement({ title: announcementToEdit.title, body: announcementToEdit.body });
-    }
-  };
-
-  const handleUpdate = () => {
-    if (editingId !== null) {
-      setAnnouncements(
-        announcements.map((a) =>
-          a.id === editingId ? { ...a, ...newAnnouncement, date: new Date() } : a
-        )
+    try {
+      const response = await axios.post(
+        'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Accouncements/CreateAnnouncement',
+        formData,
+        { 
+          headers: { 
+            ...getHeaders(), 
+            'Content-Type': 'multipart/form-data' 
+          } 
+        }
       );
-      setEditingId(null);
-      setNewAnnouncement({ title: '', body: '' });
+
+      if (response.status === 200) {
+        message.success('Elan uğurla əlavə edildi');
+        setNewAnnouncement({ title: '', content: '', image: null });
+        fetchAnnouncements();
+      }
+    } catch (error) {
+      console.error('Error adding announcement:', error);
+      message.error('Elan əlavə etmək mümkün olmadı');
     }
   };
 
-  const handleDelete = (id: number) => {
-    setAnnouncements(announcements.filter((a) => a.id !== id));
-    setDeleteConfirmId(null);
-    const newTotalPages = Math.ceil((filteredAndSortedAnnouncements.length - 1) / announcementsPerPage);
-    if (currentPage > newTotalPages) {
-      setCurrentPage(newTotalPages);
+ const handleUpdate = async () => {
+    if (editingId === null) return;
+
+    const formData = new FormData();
+    formData.append('title', newAnnouncement.title);
+    formData.append('content', newAnnouncement.content);
+    // formData.append('files', newAnnouncement.image);
+
+    if (newAnnouncement.image) {
+      formData.append('files', newAnnouncement.image);
+    }
+
+    try {
+      console.log(editingId);
+      
+      const response = await axios.put(
+        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Accouncements/EditAnnoucement?id=${editingId}`,
+        formData,
+        {
+          headers: {
+            ...getHeaders(),
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        message.success('Elan uğurla yeniləndi');
+        setNewAnnouncement({ title: '', content: '', image: null });
+        setEditingId(null);
+        fetchAnnouncements();
+      }
+    } catch (error) {
+      console.error('Error updating announcement:', error);
+      message.error('Elanı yeniləmək mümkün olmadı');
     }
   };
+
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setNewAnnouncement({ ...newAnnouncement, image: file });
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await axios.delete(
+        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Accouncements/DeleteAnnouncement?id=${id}`,
+        { headers: getHeaders() }
+      );
+
+      if (response.status === 200) {
+        message.success('Elan uğurla silindi');
+        setAnnouncements(announcements.filter((a) => a.id !== id));
+        setDeleteConfirmId(null);
+        const newTotalPages = Math.ceil((filteredAndSortedAnnouncements.length - 1) / announcementsPerPage);
+        if (currentPage > newTotalPages) {
+          setCurrentPage(newTotalPages);
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting announcement:', error);
+      message.error('Elanı silmək mümkün olmadı');
+    }
+  };
+
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
 
   // Pagination logic
   const indexOfLastAnnouncement = currentPage * announcementsPerPage;
@@ -109,6 +190,8 @@ const AnnouncementManagement: React.FC = () => {
   const totalPages = Math.ceil(filteredAndSortedAnnouncements.length / announcementsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const imagePreviewUrl = newAnnouncement.image ? URL.createObjectURL(newAnnouncement.image) : '';
 
   return (
     <div className={classes.container}>
@@ -131,17 +214,29 @@ const AnnouncementManagement: React.FC = () => {
         />
         <textarea
           placeholder="Elan kontenti..."
-          value={newAnnouncement.body}
-          onChange={(e) => setNewAnnouncement({ ...newAnnouncement, body: e.target.value })}
+          value={newAnnouncement.content}
+          onChange={(e) => setNewAnnouncement({ ...newAnnouncement, content: e.target.value })}
           className={classes.textarea}
         />
+        
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className={classes.input}
+        />
+        
+        {imagePreviewUrl && (
+          <img src={imagePreviewUrl} alt="Image Preview" className={classes.imagePreview} />
+        )}
+        
         {editingId === null ? (
           <button onClick={handleAddAnnouncement} className={classes.button}>
-           Elan əlavə et
+            Elan əlavə et
           </button>
         ) : (
           <button onClick={handleUpdate} className={classes.button}>
-           Elanı yebilə
+            Elanı yenilə
           </button>
         )}
       </div>
@@ -151,7 +246,7 @@ const AnnouncementManagement: React.FC = () => {
             Tarixə görə sırala {sortKey === 'date' && (sortOrder === 'asc' ? '↑' : '↓')}
           </button>
           <button onClick={() => handleSort('title')} className={classes.sortButton}>
-            Başlığa görə sırala{sortKey === 'title' && (sortOrder === 'asc' ? '↑' : '↓')}
+            Başlığa görə sırala {sortKey === 'title' && (sortOrder === 'asc' ? '↑' : '↓')}
           </button>
         </div>
         <div className={classes.perPageControl}>
@@ -175,18 +270,30 @@ const AnnouncementManagement: React.FC = () => {
         {currentAnnouncements.map((announcement) => (
           <div key={announcement.id} className={classes.announcementItem}>
             <h3 className={classes.announcementTitle}>{announcement.title}</h3>
-            <p className={classes.announcementBody}>{announcement.body}</p>
+            <p className={classes.announcementBody}>{announcement.content}</p>
             <p className={classes.announcementDate}>
-              {announcement.date.toLocaleString()}
+            <img 
+                src={(`data:image/jpeg;base64,${announcement.files[0]}`)} 
+                alt="Announcement" 
+                className={classes.announcementImage}
+              />
+              {new Date(announcement.createdDate).toLocaleString()}
             </p>
             <div className={classes.actionButtons}>
-              <button onClick={() => handleEdit(announcement.id)} className={classes.editButton}>
+              <button onClick={() => {
+                setEditingId(announcement.id);
+                setNewAnnouncement({
+                  title: announcement.title,
+                  content: announcement.content,
+                  image: null
+                });
+              }} className={classes.editButton}>
                 Düzəliş et
               </button>
               {deleteConfirmId === announcement.id ? (
                 <>
                   <button onClick={() => handleDelete(announcement.id)} className={classes.confirmDeleteButton}>
-                   Təsdiqlə
+                    Təsdiqlə
                   </button>
                   <button onClick={() => setDeleteConfirmId(null)} className={classes.cancelDeleteButton}>
                     Ləğv et
