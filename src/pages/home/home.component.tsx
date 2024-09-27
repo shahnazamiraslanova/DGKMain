@@ -1,7 +1,7 @@
 import { useHomeStyle } from "./home.style";
-import telimatAz from "../../assets/pdfs/TəlimatAz.pdf";
-import telimatRu from "../../assets/pdfs/TəlimatRu.pdf";
-import telimatEng from "../../assets/pdfs/TəlimatEng.pdf";
+import telimatAz from "../../assets/pdfs/İnzibatçıTəlimatıAz.pdf";
+import telimatRu from "../../assets/pdfs/İnzibatçıTəlimatıRu.pdf";
+import telimatEng from "../../assets/pdfs/İnzibatçıTəlimatıEng.pdf";
 import jwtDecode from "jwt-decode";
 import { GuideIcon } from "assets/images/icons/guide";
 import axios from "axios";
@@ -9,8 +9,21 @@ import { useEffect, useState } from "react";
 
 function HomeComponent() {
   const [adminData, setAdminData] = useState<any>(null);
-  const { homeMain, guides, eachGuide, adminInfo, guidesMain, adminDetailBox, adminDetailItem, adminLabel } = useHomeStyle();
-  
+  const {
+    homeMain,
+    guides,
+    eachGuide,
+    adminInfo,
+    guidesMain,
+    adminDetailBox,
+    adminDetailItem,
+    adminLabel,
+    profilPhoto,
+    infoHeader,
+    adminHeaderLeft,
+    adminText,
+  } = useHomeStyle();
+
   const pdfs = {
     telimatAz,
     telimatRu,
@@ -41,7 +54,6 @@ function HomeComponent() {
         }
       );
       setAdminData(response.data.data);
-
     } catch (error) {
       console.log(error);
     }
@@ -49,35 +61,60 @@ function HomeComponent() {
 
   useEffect(() => {
     getAdminData();
-    
   }, []);
   console.log(adminData);
-
 
   return (
     <div className={homeMain}>
       <div className={adminInfo}>
-        <h2>Admin Information</h2>
+        <h2 className={adminText}>İnzibatçı Məlumatları</h2>
         {adminData ? (
           <div className={adminDetailBox}>
-            <div className={adminDetailItem}><span className={adminLabel}>Name: </span>{adminData.name}</div>
-            <div className={adminDetailItem}><span className={adminLabel}>Surname: </span>{adminData.surname}</div>
-            <div className={adminDetailItem}><span className={adminLabel}>Father Name: </span>{adminData.fatherName}</div>
-            <div className={adminDetailItem}><span className={adminLabel}>Username: </span>{adminData.username}</div>
-            <div className={adminDetailItem}><span className={adminLabel}>Inspector ID: </span>{adminData.inspectorId}</div>
-            <div className={adminDetailItem}><span className={adminLabel}>Branch Code: </span>{adminData.branchCode}</div>
-            <div className={adminDetailItem}><span className={adminLabel}>Customs Code: </span>{adminData.customsCode}</div>
-            <div className={adminDetailItem}><span className={adminLabel}>Access Delivery: </span>{adminData.AccessDelivery}</div>
-            <div className={adminDetailItem}><span className={adminLabel}>Access GPS: </span>{adminData.AccessGps}</div>
-            <div className={adminDetailItem}><span className={adminLabel}>Access Unloading: </span>{adminData.AccessUnloading}</div>
-            <div className={adminDetailItem}><span className={adminLabel}>Token ID: </span>{adminData.tokenId}</div>
+            <div className={infoHeader}>
+              <img
+                className={profilPhoto}
+                src={
+                  adminData.image
+                    ? adminData.image
+                    : "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+                }
+                alt=""
+              />
+              <div className={adminHeaderLeft}>
+                <div className={adminDetailItem}>
+                  <span className={adminLabel}>Adı: </span>
+                  {adminData.userInfo}
+                </div>
+                <div className={adminDetailItem}>
+                  <span className={adminLabel}>Vəzifəsi: </span>
+                  {adminData.positionName}
+                </div>
+                <div className={adminDetailItem}>
+                  <span className={adminLabel}>İdarə: </span>
+                  {adminData.customsName}
+                </div>
+              </div>
+            </div>
+            <div className={adminDetailItem}>
+              <span className={adminLabel}>Departament: </span>
+              {adminData.firmName}
+            </div>
+
+            <div className={adminDetailItem}>
+              <span className={adminLabel}>Inspektor ID: </span>
+              {adminData.inspectorId}
+            </div>
+            <div className={adminDetailItem}>
+              <span className={adminLabel}>Telefon: </span>
+              {adminData.phone}
+            </div>
           </div>
         ) : (
-          <p>Loading admin data...</p>
+          <p>Admin Datası yüklənir</p>
         )}
       </div>
       <div className={guidesMain}>
-        <h2>Download Guides</h2>
+        <h2 className={adminText}>Təlimatlar</h2>
         <div className={guides}>
           <button
             className={eachGuide}
@@ -86,7 +123,8 @@ function HomeComponent() {
             {GuideIcon()}
             Azərbaycanca təlimat
           </button>
-          <br /><br />
+          <br />
+          <br />
           <button
             className={eachGuide}
             onClick={() => downloadPDF(pdfs.telimatRu)}
@@ -94,7 +132,8 @@ function HomeComponent() {
             {GuideIcon()}
             Rusca təlimat
           </button>
-          <br /><br />
+          <br />
+          <br />
           <button
             className={eachGuide}
             onClick={() => downloadPDF(pdfs.telimatEng)}

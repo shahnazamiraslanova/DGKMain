@@ -11,13 +11,13 @@ const styles = {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      width: '30%',
-      '& h2': {
-        fontSize: '30px',
+      width: '30%'
+    },
+    adminText:{
+      fontSize: '30px',
         fontWeight: 'bold',
         color: '#394E75',
         marginBottom: '20px',
-      },
     },
     adminInfo: {
       width: '50%',
@@ -44,8 +44,9 @@ const styles = {
     },
   
     adminDetailBox: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
+      display: 'flex',
+      flexDirection:'column',
+      // gridTemplateColumns: '1fr 1fr',
       gap: '15px',
       backgroundColor: '#f9f9f9',
       padding: '20px',
@@ -67,6 +68,24 @@ const styles = {
       fontSize: '16px',
       marginBottom: '5px',
     },
+    profilPhoto:{
+      borderRadius:'50%',
+      width:'220px',
+      height:'220px'
+    },
+    infoHeader:{
+      height:'250px',
+      display:'flex',
+      justifyContent:'space-between',
+      alignItems:'center'
+    },
+    adminHeaderLeft:{
+      width:'65%',
+      display:'flex',
+      flexDirection:'column',
+      gap:'20px'
+
+    }
   };
   
   export const useHomeStyle = createUseStyles(styles);

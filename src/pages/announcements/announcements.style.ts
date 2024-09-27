@@ -241,6 +241,11 @@ const styles: Styles = {
       margin: '5px',
     },
   },
+  createButton:{
+    backgroundColor:'#394e75',
+    color:'white',
+    marginBottom:'20px'
+  }
 };
 
 export default styles;
