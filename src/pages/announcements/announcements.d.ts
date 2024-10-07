@@ -15,6 +15,6 @@ export interface Announcement {
     title: string;
     content: string;
     createdDate: string;
-    files?: string[]; // Optional, adjust as necessary
+    files?: string[]; 
   }
   

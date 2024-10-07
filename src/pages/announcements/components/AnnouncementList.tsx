@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { createUseStyles } from "react-jss";
 import { Carousel, Modal, Input, Button, message, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import type { RcFile, UploadProps } from 'antd/es/upload/interface';
+import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
 import styles from "../announcements.style";
 import axios from "axios";
 
@@ -22,40 +22,26 @@ interface AnnouncementListProps {
   getHeaders: () => { accept: string; "api-key": string };
 }
 
-const CustomPrevArrow = (props: any) => (
-  <div {...props} style={{ ...props.style, display: 'block', background: 'black', borderRadius: '50%' }}>
-    <span style={{ color: 'white', padding: '10px' }}>&lt;</span>
-  </div>
-);
-
-const CustomNextArrow = (props: any) => (
-  <div {...props} style={{ ...props.style, display: 'block', background: 'black', borderRadius: '50%' }}>
-    <span style={{ color: 'white', padding: '10px' }}>&gt;</span>
-  </div>
-);
-
 const AnnouncementList: React.FC<AnnouncementListProps> = ({
   announcements,
   fetchAnnouncements,
   getHeaders,
 }) => {
   const classes = useStyles();
-  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [editingImages, setEditingImages] = useState<string[]>([]);
+  const [editingImages, setEditingImages] = useState<UploadFile[]>([]);
 
   const handleDelete = async (id: number) => {
     try {
       const response = await axios.delete(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Accouncements/DeleteAnnouncement?id=${id}`,
+        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Announcements/DeleteAnnouncement?id=${id}`,
         { headers: getHeaders() }
       );
 
       if (response.status === 200) {
         message.success("Elan uğurla silindi");
-        setDeleteConfirmId(null);
         fetchAnnouncements();
       }
     } catch (error) {
@@ -64,24 +50,42 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
     }
   };
 
+  const confirmDelete = (id: number) => {
+    Modal.confirm({
+      title: "Elanı silmək istədiyinizdən əminsiniz?",
+      content: "Bu əməliyyatı ləğv edə bilməzsiniz.",
+      okText: "Bəli",
+      okType: "danger",
+      cancelText: "Xeyr",
+      onOk: () => handleDelete(id),
+    });
+  };
+
   const handleEdit = async () => {
     if (editingAnnouncement) {
-      const hasChanges =
-        title !== editingAnnouncement.title ||
-        content !== editingAnnouncement.content;
+      const formData = new FormData();
+      formData.append('id', editingAnnouncement.id.toString());
+      formData.append('title', title || editingAnnouncement.title);
+      formData.append('content', content || editingAnnouncement.content);
 
-      const updatedData = {
-        id: editingAnnouncement.id,
-        title: hasChanges ? title : editingAnnouncement.title,
-        content: hasChanges ? content : editingAnnouncement.content,
-      };
+      // Add existing files
+      editingAnnouncement.files.forEach((file) => {
+        formData.append('files', file); // Append existing files
+      });
 
-      // Construct the URL with query parameters
-      const query = new URLSearchParams(updatedData).toString();
-      const url = `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Accouncements/EditAnnouncement?${query}`;
+      // Add new uploaded images
+      editingImages.forEach((file) => {
+        if (file.originFileObj) {
+          formData.append('files', file.originFileObj as File);
+        }
+      });
 
       try {
-        const response = await axios.put(url, null, { headers: getHeaders() });
+        const response = await axios.put(
+          `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Announcements/EditAnnouncement`,
+          formData,
+          { headers: { ...getHeaders(), 'Content-Type': 'multipart/form-data' } }
+        );
 
         if (response.status === 200) {
           message.success("Elan uğurla yeniləndi");
@@ -99,7 +103,13 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
     setEditingAnnouncement(announcement);
     setTitle(announcement.title);
     setContent(announcement.content);
-    setEditingImages(announcement.files);
+    // Convert existing files to UploadFile format
+    setEditingImages(announcement.files.map((file, index) => ({
+      uid: `existing-${index}`,
+      name: `Existing Image ${index + 1}`,
+      status: 'done',
+      url: `data:image/jpeg;base64,${file}`,
+    })));
   };
 
   const closeEditModal = () => {
@@ -109,34 +119,18 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
     setEditingImages([]);
   };
 
-  const getBase64 = (file: RcFile): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-    });
-
-  const handleImageUpload: UploadProps['onChange'] = async (info) => {
-    const { file } = info;
-    if (file.status === 'uploading') {
-      console.log('Uploading:', file, info);
-    }
-    if (file instanceof File) {
-      try {
-        const base64 = await getBase64(file as RcFile);
-        const base64WithoutPrefix = base64.split(',')[1];
-        setEditingImages(prevImages => [...prevImages, base64WithoutPrefix]);
-        message.success(`${file.name} şəkil əlavə edildi`);
-      } catch (error) {
-        console.error('Error converting file to base64:', error);
-        message.error(`${file.name} şəkil əlavə etmək mümkün olmadı.`);
-      }
-    }
+  const handleImageUpload: UploadProps['onChange'] = (info) => {
+    let fileList = [...info.fileList];
+    
+    // Combine existing images with new uploads
+    fileList = editingImages.filter(file => file.url).concat(fileList);
+    
+    setEditingImages(fileList);
+    message.success(`${fileList.length} şəkil əlavə edildi`);
   };
 
-  const removeImage = (index: number) => {
-    setEditingImages((prev) => prev.filter((_, i) => i !== index));
+  const removeImage = (uid: string) => {
+    setEditingImages((prev) => prev.filter((file) => file.uid !== uid));
   };
 
   return (
@@ -146,58 +140,27 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
           <h3 className={classes.announcementTitle}>{announcement.title}</h3>
           <p className={classes.announcementBody}>{announcement.content}</p>
           <p className={classes.announcementDate}>
-            <div style={{ width: '200px', overflow: 'hidden' }}>
-              <Carousel
-                autoplay
-                dots
-                arrows
-                prevArrow={<CustomPrevArrow />}
-                nextArrow={<CustomNextArrow />}
-              >
-                {announcement.files.map((item, index) => (
-                  <div key={index}>
-                    <img
-                      src={`data:image/jpeg;base64,${item}`}
-                      alt={`Announcement ${index + 1}`}
-                      className={classes.announcementImage}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </div>
-                ))}
-              </Carousel>
-            </div>
+            <Carousel autoplay dots>
+              {announcement.files.map((item, index) => (
+                <div key={index}>
+                  <img
+                    src={`data:image/jpeg;base64,${item}`}
+                    alt={`Announcement ${index + 1}`}
+                    className={classes.announcementImage}
+                    style={{ width: '200px', height: '200px', objectFit: 'cover' }}
+                  />
+                </div>
+              ))}
+            </Carousel>
             <span>{new Date(announcement.createdDate).toLocaleString()}</span>
           </p>
           <div className={classes.actionButtons}>
-            <button
-              onClick={() => openEditModal(announcement)}
-              className={classes.editButton}
-            >
+            <button onClick={() => openEditModal(announcement)} className={classes.editButton}>
               Düzəliş et
             </button>
-            {deleteConfirmId === announcement.id ? (
-              <>
-                <button
-                  onClick={() => handleDelete(announcement.id)}
-                  className={classes.confirmDeleteButton}
-                >
-                  Təsdiqlə
-                </button>
-                <button
-                  onClick={() => setDeleteConfirmId(null)}
-                  className={classes.cancelDeleteButton}
-                >
-                  Ləğv et
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setDeleteConfirmId(announcement.id)}
-                className={classes.deleteButton}
-              >
-                Sil
-              </button>
-            )}
+            <button onClick={() => confirmDelete(announcement.id)} className={classes.deleteButton}>
+              Sil
+            </button>
           </div>
         </div>
       ))}
@@ -232,22 +195,23 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
         <div>
           <Upload
             accept="image/*"
-            showUploadList={false}
-            beforeUpload={() => false}
+            multiple
+            fileList={editingImages}
             onChange={handleImageUpload}
+            beforeUpload={() => false} // Prevent automatic upload
           >
             <Button icon={<UploadOutlined />}>Şəkil əlavə et</Button>
           </Upload>
         </div>
         <div style={{ marginTop: 10 }}>
-          {editingImages.map((image, index) => (
-            <div key={index} style={{ display: 'inline-block', margin: '5px' }}>
+          {editingImages.map((image) => (
+            <div key={image.uid} style={{ display: 'inline-block', margin: '5px' }}>
               <img
-                src={`data:image/jpeg;base64,${image}`}
-                alt={`Editing ${index}`}
+                src={image.url || (image.originFileObj && URL.createObjectURL(image.originFileObj))}
+                alt={`Editing ${image.name}`}
                 style={{ width: '100px', height: '100px', objectFit: 'cover' }}
               />
-              <Button onClick={() => removeImage(index)} size="small" danger>
+              <Button onClick={() => removeImage(image.uid)} size="small" danger>
                 Sil
               </Button>
             </div>

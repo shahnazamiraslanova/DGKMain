@@ -1,54 +1,65 @@
-import React from 'react';
-import { Modal, Table, Typography } from 'antd';
-import { Vote } from '../polls';
+import React, { useMemo } from 'react';
+import { Modal, Table, Typography, Spin } from 'antd';
+import { VoteDetailsModalProps } from '../polls';
 
 const { Text } = Typography;
 
-interface VoteDetailsModalProps {
-  visible: boolean;
-  onCancel: () => void;
-  voteDetails: {
-    result: any[]; // Adjust to a specific type if possible
-    pollVotes: any[];
-  };
-}
-
 const VoteDetailsModal: React.FC<VoteDetailsModalProps> = ({ visible, onCancel, voteDetails }) => {
-  // Ensure that the pollVotes array has the necessary properties for rendering
-  const resultColumns = [
-    { title: 'Seçim', dataIndex: 'optionId', key: 'optionId' },
-    { title: 'Səslər', dataIndex: 'count', key: 'count' }, // Assuming 'count' is the correct field in Vote
-  ];
+  console.log("Vote Details:", voteDetails);
+
+  // Check if voteDetails is loaded
+  const isLoading = !voteDetails;
+
+  const voteData = useMemo(() => {
+    if (!voteDetails || !Array.isArray(voteDetails) || voteDetails.length === 0) return []; // Ensure voteDetails is a non-empty array
+
+    const userDetails = voteDetails[0]; // Access the first object
+
+    // Extract user and options
+    const users = userDetails?.user || []; // User array
+    const options = userDetails?.options || []; // Options array
+
+    // Combine user and options in one object
+    return users.map((user:any) => ({
+      key: user.userId,
+      name: user.name,
+      surname: user.surname,
+      options: options.map((option:any) => option.optionContent).join(', ') || '', // Join all options
+    }));
+  }, [voteDetails]);
+
+  console.log("Vote Data:", voteData);
 
   const voteColumns = [
-    { title: 'İstifadəçi', dataIndex: 'userId', key: 'userId' },
-    { title: 'Seçim', dataIndex: 'optionId', key: 'optionId' },
-    // Uncomment and adjust as needed for vote date
-    // { title: 'Vote Date', dataIndex: 'voteDate', key: 'voteDate', 
-    //   render: (date: string) => new Date(date).toLocaleString() },
+    { title: 'İstifadəçi', dataIndex: 'name', key: 'name' },
+    { title: 'Soyad', dataIndex: 'surname', key: 'surname' },
+    { title: 'Seçim', dataIndex: 'options', key: 'options' },
   ];
 
   return (
     <Modal
       title="Sorğu nəticələri"
-      visible={visible}
+      open={visible}
       onCancel={onCancel}
       footer={null}
       width={800}
+      aria-label="Vote Details Modal"
     >
-      <Text strong>Xülasə:</Text>
-      <Table
-        dataSource={voteDetails.pollVotes}
-        columns={resultColumns}
-        rowKey="optionId"
-        pagination={false}
-      />
-      <Text strong style={{ marginTop: 16, display: 'block' }}>Səsvermə detalları:</Text>
-      <Table
-        dataSource={voteDetails.pollVotes} // This may need to be changed if you have a different data source for details
-        columns={voteColumns}
-        rowKey="id" // Ensure 'id' is a valid field in your Vote type
-      />
+      {/* <Text strong style={{ marginTop: 16, display: 'block' }}>Səsvermə detalları:</Text> */}
+      {isLoading ? (
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <Spin tip="Yüklənir..." />
+          <Text> məlumatlar yüklənir. Lütfən gözləyin...</Text>
+        </div>
+      ) : voteData.length > 0 ? (
+        <Table
+          dataSource={voteData}
+          columns={voteColumns}
+          rowKey="key"
+        />
+      ) : (
+        <Text type="secondary">Heç bir səs yoxdur.</Text>
+      )}
     </Modal>
   );
 };

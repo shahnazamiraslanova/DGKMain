@@ -97,7 +97,8 @@ const styles = {
         width: '100%',
         backgroundColor: '#fdfe65',
         color: '#516385',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        margin:'0'
     },
     sendAgain: {
         backgroundColor: 'transparent',

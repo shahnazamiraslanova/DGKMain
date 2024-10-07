@@ -1,14 +1,9 @@
 import React from 'react';
 import { Table, Button, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { PollListProps } from '../polls';
 
-interface PollListProps {
-  polls: any[];
-  onEdit: (poll: any) => void;
-  onDelete: (id: any) => void;
-  onViewVotes: (id: any) => void;
-  isSubmitting: boolean;
-}
+
 
 const PollList: React.FC<PollListProps> = ({ polls, onEdit, onDelete, onViewVotes, isSubmitting }) => {
   const columns = [

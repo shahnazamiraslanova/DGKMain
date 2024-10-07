@@ -75,7 +75,7 @@ function HomeComponent() {
                 className={profilPhoto}
                 src={
                   adminData.image
-                    ? adminData.image
+                    ? "data:image/jpeg;base64,"+adminData.image
                     : "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
                 }
                 alt=""
@@ -110,7 +110,7 @@ function HomeComponent() {
             </div>
           </div>
         ) : (
-          <p>Admin Datası yüklənir</p>
+          <p>Admin Datası yüklənir...</p>
         )}
       </div>
       <div className={guidesMain}>

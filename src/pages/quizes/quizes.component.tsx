@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
+import {  EyeOutlined } from '@ant-design/icons';
+
 import {
   Modal,
   Button,
@@ -33,7 +35,6 @@ import {
   ISelectedUser,
   IUser,
 } from "./quizes";
-import { setServers } from "dns/promises";
 
 const QuizsComponent: React.FC = () => {
   const classes = useQuizStyles();
@@ -52,6 +53,8 @@ const QuizsComponent: React.FC = () => {
   const [isManageGroupModalVisible, setIsManageGroupModalVisible] =
     useState(false);
   const [isSeeResultsModalVisible, setIsSeeResultsModalVisible] =
+    useState(false);
+    const [isSeeResultsModalVisible2, setIsSeeResultsModalVisible2] =
     useState(false);
   const [isAssignQuizModalVisible, setIsAssignQuizModalVisible] =
     useState(false);
@@ -98,6 +101,13 @@ const QuizsComponent: React.FC = () => {
   const [quizResults, setQuizResults] = useState([]);
 
   // GET REQUESTS
+
+
+
+
+
+
+  
   const fetchQuizResults = async (quizId: number) => {
     try {
       const response = await axios.get(
@@ -109,7 +119,7 @@ const QuizsComponent: React.FC = () => {
           },
         }
       );
-      setQuizResults(response.data.data);
+      setQuizResults(response.data.data || []);
     } catch (error) {
       console.error("Failed to fetch quiz results:", error);
       message.error("Nəticələri əldə etmək mümkün olmadı");
@@ -143,13 +153,9 @@ const QuizsComponent: React.FC = () => {
           },
         }
       );
-      const fetchedUsers: IUser[] = response.data.data.map((user: any) => ({
-        id: user.id,
-        name: user.name,
-        surname: user.surname,
-      }));
+ 
 
-      setUsers(fetchedUsers);
+      setUsers(response.data.data);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -277,7 +283,7 @@ const QuizsComponent: React.FC = () => {
 
       setQuizzes((prevQuizzes) => [response.data.data, ...prevQuizzes]);
       handleCancel();
-      quizForm.resetFields();
+      questionForm.resetFields();
     } catch (error) {
       console.error("Failed to create quiz:", error);
     }
@@ -431,13 +437,15 @@ const QuizsComponent: React.FC = () => {
   const handleEditQuestion = async (questionId: number, quizId: number) => {
     try {
       const values = await questionForm.validateFields();
+      
       const options = [
         { isTrue: values.correctOption === 1, content: values.option1 },
         { isTrue: values.correctOption === 2, content: values.option2 },
         { isTrue: values.correctOption === 3, content: values.option3 },
         { isTrue: values.correctOption === 4, content: values.option4 },
       ];
-
+  
+      // Make the API request to update the question
       const response = await axios.put(
         "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizQuestion",
         {
@@ -447,25 +455,31 @@ const QuizsComponent: React.FC = () => {
         },
         {
           headers: {
-            accept: "application/json",
-            "api-key": token || "",
+            Accept: "application/json",
+            "api-key": token || "",  
           },
         }
       );
-
-      setQuestionsByQuiz((prev) => ({
-        ...prev,
-        [quizId]: prev[quizId].map((q) =>
-          q.id === questionId ? response.data.data : q
-        ),
-      }));
-
-      message.success("Sual redaktə olundu");
-      setEditingQuestionId(null);
+  
+      if (response.data && response.data.data) {
+        setQuestionsByQuiz((prev) => ({
+          ...prev,
+          [quizId]: prev[quizId].map((q) =>
+            q.id === questionId ? { ...q, ...response.data.data } : q
+          ),
+        }));
+  
+        message.success("Sual redaktə olundu");
+        setEditingQuestionId(null); 
+      } else {
+        throw new Error("No data returned from the server");
+      }
     } catch (error) {
+      console.error("Error editing question:", error);  
       message.error("Sual redaktə oluna bilmədi");
     }
   };
+  
 
   const handleEditOption = async (
     optionId: number,
@@ -630,21 +644,13 @@ const QuizsComponent: React.FC = () => {
 
 
   function findCommonElements(arr1:any, arr2:any) {
-    const set1 = new Set(arr1); // Convert the first array to a Set
-    const commonElements = arr2.filter((item:any) => set1.has(item)); // Find common elements
+    const set1 = new Set(arr1); 
+    const commonElements = arr2.filter((item:any) => set1.has(item)); 
   
     return commonElements;
   }
   
-  // Example usage
 
-  
-  // const common = findCommonElements(arr1, arr2);
-  // if (common.length > 0) {
-  //   console.log("Common elements:", common); // Output: Common elements: [4, 5]
-  // } else {
-  //   console.log("No common elements found.");
-  // }
   
 
 
@@ -759,7 +765,6 @@ const QuizsComponent: React.FC = () => {
         "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizGroupMember",
         {
           groupId: groupId,
-          // userId:localStorage.getItem("inspectorId"),
           quizGroupMemberIds: quizGroupMemberIds,
         },
         {
@@ -776,6 +781,29 @@ const QuizsComponent: React.FC = () => {
     }
   };
 
+
+
+
+
+ 
+
+
+  const showResultOfGeneratedQuiz = async (quizId: any) => {
+    try {
+      const response = await axios.get(`https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllUserResultByGeneratedQuizId/${quizId}`, {
+        headers: {
+          accept: "application/json",
+          "api-key": token || "",
+        },
+      });
+      console.log(response.data);
+      
+      setQuizResults(response.data); // Use response.data instead of response?.data
+    } catch (error) {
+      console.error("Error fetching quiz results:", error);
+    }
+  };
+  
   return (
     <div className={classes.quizContainer}>
       <div className={classes.mainBtns}>
@@ -797,12 +825,8 @@ const QuizsComponent: React.FC = () => {
         >
           Mövcud qrupları idarə et
         </Button>
-        <Button
-          className={classes.btn}
-          onClick={() => setIsSeeResultsModalVisible(true)}
-        >
-          Nəticələri gör
-        </Button>
+        
+     
       </div>
 
       <Collapse
@@ -1001,7 +1025,8 @@ const QuizsComponent: React.FC = () => {
                               <Button
                                 icon={<DeleteOutlined />}
                                 onClick={() =>
-                                  handleDeleteQuestion(question.id, quiz.id)
+                                  showConfirmDialog("Silmək istədiyinizə əminsiniz?", ()=>handleDeleteQuestion(question.id, quiz.id))
+                                  
                                 }
                                 className={`${classes.btn} ${classes.actionBtn}`}
                               >
@@ -1178,7 +1203,7 @@ const QuizsComponent: React.FC = () => {
             >
               {users.map((user) => (
                 <Option key={user.id.toString()} value={user.id.toString()}>
-                  {user.name + " " + user.surname}
+                  {user.name + " " + user.surname + " " +user.fatherName }
                 </Option>
               ))}
             </Select>
@@ -1222,7 +1247,7 @@ const QuizsComponent: React.FC = () => {
                   </Button>
                   <Button
                     icon={<DeleteOutlined />}
-                    onClick={() => handleDeleteGroup(record.id)}
+                    onClick={() => showConfirmDialog("Silmək istədiyinizə əminsiniz?", ()=>handleDeleteGroup(record.id))}
                     className={`${classes.btn} ${classes.actionBtn}`}
                   >
                     Sil
@@ -1237,7 +1262,11 @@ const QuizsComponent: React.FC = () => {
                   >
                     Quiz təyin et
                   </Button>
-                </>
+                  <Button
+          className={classes.btn}
+          onClick={() => {setIsSeeResultsModalVisible(true); getAllgeneratedQuizesByGroupId(record.id);}}
+        >
+<EyeOutlined/>        </Button>                </>
               ),
             },
           ]}
@@ -1401,15 +1430,9 @@ const QuizsComponent: React.FC = () => {
             onClick={() => {
               console.log(selectedGroup, selectedGroupMembers);
               
-              // console.log(findCommonElements(selectedGroup, users));
-              
-
-              // if (group) {
-                
-              // }
+           
               handleSaveNewUsers(selectedGroup);
-              // newTitle("") 
-              // users("");
+             
             }}
           >
             Saxla
@@ -1489,13 +1512,12 @@ const QuizsComponent: React.FC = () => {
       </Modal>
       <Modal
         title="Nəticələr"
-        // onOk={() => handleRemoveUser(selectedGroup)}
         visible={isSeeResultsModalVisible}
         onCancel={() => setIsSeeResultsModalVisible(false)}
         footer={[
           <Button
             key="cancel"
-            onClick={() => setIsSeeResultsModalVisible(false)}
+            onClick={() => {setIsSeeResultsModalVisible(false); getAllgeneratedQuizesByGroupId(selectedGroup);}}
           >
             Bağla
           </Button>,
@@ -1514,22 +1536,65 @@ const QuizsComponent: React.FC = () => {
           </Button>,
         ]}
       >
-        <Table
-          dataSource={quizResults}
-          columns={[
-            {
-              title: "İstifadəçi",
-              dataIndex: "userName",
-              key: "userName",
-            },
-            {
-              title: "Nəticə",
-              dataIndex: "score",
-              key: "score",
-            },
-            // Add more columns as needed
-          ]}
-        />
+         {genaratedQuizes.length > 0
+            ? genaratedQuizes.map((quiz: any) => (
+                <div
+                  key={quiz.id}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    marginTop: "10px",
+                  }}
+                >
+                  <h3>{quiz.quizes.title + quiz.id}</h3>
+                  <Button
+                    onClick={() => {
+                      setIsSeeResultsModalVisible2(true);
+                      showResultOfGeneratedQuiz(quiz.id);
+                    }}
+                  >
+                    Nəticələr
+                  </Button>
+                </div>
+              ))
+            : "Boşdur"}
+      
+      </Modal>
+
+      <Modal
+        title="Nəticələr"
+        visible={isSeeResultsModalVisible2}
+        onCancel={() => setIsSeeResultsModalVisible2(false)}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => setIsSeeResultsModalVisible2(false)}
+          >
+            Bağla
+          </Button>,
+        ]}
+      >
+       
+       {quizResults.length > 0
+            ? genaratedQuizes.map((result: any) => (
+                <div
+                  key={result.id}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    marginTop: "10px",
+                  }}
+                >
+                  <h3>{result.name + result.surName}</h3>
+                  
+                </div>
+              ))
+            : "Boşdur"}
+      
+      
+ 
       </Modal>
     </div>
   );

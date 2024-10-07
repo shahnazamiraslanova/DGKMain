@@ -11,8 +11,8 @@ import { Routes } from 'router/routes';
 import { useNavigate } from 'react-router-dom';
 
 const LoginComponent = () => {
-  const OTP_URL = 'https://c2c-fvaisoutbusiness.customs.gov.az:7546/api/Account/get-otp';
-  const LOGIN_URL = 'https://c2c-fvaisoutbusiness.customs.gov.az:7546/api/Account/sign-in';
+  const OTP_URL = 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Account/get-otp';
+  const LOGIN_URL = 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Account/sign-in';
   const navigate = useNavigate();
   const { panel, loginMain, logoImg, input, inputContainer, button, showPasswordButton, loginTitle, sendAgain, sendAgainText } = useLoginStyles();
 
@@ -27,11 +27,10 @@ const LoginComponent = () => {
   const [passwordIsOk, setPasswordIsOk] = useState(true);
   const [number, setNumber] = useState("");
 
-  // Check if user is already logged in and token is valid
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken && isTokenValid(storedToken)) {
-      navigate(Routes.home); // Navigate to home if token is valid
+      navigate(Routes.home); 
     }
   }, [navigate]);
 
@@ -42,7 +41,6 @@ const LoginComponent = () => {
     }
   }, []);
 
-  // Function to request OTP
   const loginFun = async () => {
     const usernameValid = username.trim() !== '';
     const passwordValid = password.trim() !== '';
@@ -57,19 +55,18 @@ const LoginComponent = () => {
         if (response.data) {
           localStorage.setItem('username', username);
           setShowOtpForm(true);
-          setNumber(response.data.data); // Display the phone number for OTP
+          setNumber(response.data.data); 
         } else {
-        //   toast.error('İstifadəçi adı və ya şifrə yalnışdır');
+       console.log("salam");
+       
         }
       } catch (error) {
-        // toast.error('Xəta baş verdi. Yenidən cəhd edin.');
+        console.log("salam");
+        
       }
-    } else {
-    //   toast.error('İstifadəçi adı və şifrə boş qoyula bilməz');
     }
   };
 
-  // Handle OTP input changes
   const handleOtpChange = (index: number, value: any) => {
     const newOtp = [...otp];
     newOtp[index] = value;
@@ -80,7 +77,6 @@ const LoginComponent = () => {
     }
   };
 
-  // OTP submission logic
   const handleOtpSubmit = async () => {
     const otpCode = otp.join('');
     if (otpCode.length === 6) {
@@ -90,16 +86,13 @@ const LoginComponent = () => {
         if (response.data) {
           localStorage.setItem('token', response.data.data);
           dispatch(setToken(response.data.data));
-        //   toast.success('Daxil oldunuz!');
-          navigate(Routes.home); // Redirect to home page
-        } else {
-        //   toast.error('OTP səhvdir və ya istifadəçi adı yalnışdır');
-        }
+     
+          navigate(Routes.home); 
+        } 
       } catch (error) {
-        // toast.error('Xəta baş verdi. Yenidən cəhd edin.');
+        console.log(error);
+        
       }
-    // } else {
-    //   toast.error('Zəhmət olmasa 6 rəqəmli OTP-ni daxil edin');
     }
   };
 

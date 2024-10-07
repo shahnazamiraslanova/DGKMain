@@ -43,7 +43,7 @@ const AnnouncementManagement: React.FC = () => {
   const fetchAnnouncements = async () => {
     try {
       const response = await axios.get(
-        'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Accouncements/GetAnnouncemets',
+        'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Announcements/GetAnnouncemets',
         { headers: getHeaders() }
       );
       setAnnouncements(response.data.data);
@@ -124,11 +124,7 @@ const AnnouncementManagement: React.FC = () => {
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
-      {/* <PollModal
-        isOpen={isPollModalOpen}
-        onClose={() => setIsPollModalOpen(false)}
-        getHeaders={getHeaders}
-      /> */}
+     
     </div>
   );
 };

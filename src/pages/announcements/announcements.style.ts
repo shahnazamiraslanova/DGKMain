@@ -177,6 +177,7 @@ const styles: Styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '20px',
+    gap:'20px'
   },
   sortControls: {
     display: 'flex',

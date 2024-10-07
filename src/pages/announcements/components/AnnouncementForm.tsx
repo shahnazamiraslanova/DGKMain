@@ -8,40 +8,19 @@ import { UploadOutlined } from '@ant-design/icons';
 const useStyles = createUseStyles(styles);
 
 interface AnnouncementFormProps {
-  editingId: number | null;
-  setEditingId: (id: number | null) => void;
   fetchAnnouncements: () => void;
   getHeaders: () => { accept: string; "api-key": string };
 }
 
-const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ editingId, setEditingId, fetchAnnouncements, getHeaders }) => {
+const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ fetchAnnouncements, getHeaders }) => {
   const classes = useStyles();
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: '',
     content: '',
-    images: [] as File[], // Changed to handle multiple images
+    images: [] as File[],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-
-  useEffect(() => {
-    if (editingId !== null) {
-      const fetchAnnouncementForEdit = async () => {
-        try {
-          const response = await axios.get(
-            `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Accouncements/GetAnnouncementById?id=${editingId}`,
-            { headers: getHeaders() }
-          );
-          const { title, content } = response.data.data;
-          setNewAnnouncement({ title, content, images: [] }); // Reset images on edit
-        } catch (error) {
-          console.error('Error fetching announcement for edit:', error);
-          message.error('Elanı yükləmək mümkün olmadı');
-        }
-      };
-      fetchAnnouncementForEdit();
-    }
-  }, [editingId, getHeaders]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -50,7 +29,7 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ editingId, setEditi
 
   const handleImageChange = (fileList: File[]) => {
     setNewAnnouncement(prev => ({ ...prev, images: [...prev.images, ...fileList] }));
-    return false; // Prevent the automatic upload
+    return false; // Prevent automatic upload
   };
 
   const handleImageDelete = (index: number) => {
@@ -77,22 +56,12 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ editingId, setEditi
     });
 
     try {
-      if (editingId === null) {
-        await axios.post(
-          'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Accouncements/CreateAnnouncement',
-          formData,
-          { headers: { ...getHeaders(), 'Content-Type': 'multipart/form-data' } }
-        );
-        message.success('Elan uğurla əlavə edildi');
-      } else {
-        await axios.put(
-          `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Accouncements/EditAnnoucement?id=${editingId}`,
-          formData,
-          { headers: { ...getHeaders(), 'Content-Type': 'multipart/form-data' } }
-        );
-        message.success('Elan uğurla yeniləndi');
-        setEditingId(null);
-      }
+      await axios.post(
+        'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Announcements/CreateAnnouncement',
+        formData,
+        { headers: { ...getHeaders(), 'Content-Type': 'multipart/form-data' } }
+      );
+      message.success('Elan uğurla əlavə edildi');
       setNewAnnouncement({ title: '', content: '', images: [] }); // Reset state after submission
       fetchAnnouncements();
       setIsModalVisible(false); // Close the modal after submit
@@ -114,10 +83,10 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ editingId, setEditi
       </Button>
 
       <Modal
-        title={editingId === null ? 'Yeni Elan Yarat' : 'Elanı Yenilə'}
+        title="Yeni Elan Yarat"
         visible={isModalVisible}
         onCancel={closeModal}
-        footer={null} // We'll handle the submit button inside the form
+        footer={null}
       >
         <Form
           onFinish={handleSubmit}
@@ -176,7 +145,7 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ editingId, setEditi
 
           <Form.Item>
             <Button style={{ marginTop: '20px' }} type="primary" htmlType="submit" className={classes.button} disabled={isSubmitting}>
-              {editingId === null ? 'Elan əlavə et' : 'Elanı yenilə'}
+              Elan əlavə et
             </Button>
           </Form.Item>
         </Form>

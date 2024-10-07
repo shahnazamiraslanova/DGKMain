@@ -1,30 +1,30 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, Button, Select } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { PollFormProps } from '../polls';
 
 const { Option } = Select;
-
-interface PollFormProps {
-  visible: boolean;
-  onCancel: () => void;
-  onSubmit: (values: any, isEditing: boolean) => void;
-  editingPoll: any;
-  firms: any[];
-  isSubmitting: boolean;
-}
 
 const PollForm: React.FC<PollFormProps> = ({ visible, onCancel, onSubmit, editingPoll, firms, isSubmitting }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
     if (visible && editingPoll) {
+      // For editing an existing poll, set the fields
       form.setFieldsValue({
         pollTitle: editingPoll.pollTitle,
         options: editingPoll.options.map((option: any) => ({ optionContent: option.optionContent })),
-        firms: editingPoll.firms.map((firm: any) => firm.firmId)
+        firms: editingPoll.firms.map((firm: any) => firm.firmId),
       });
     } else {
+      // For creating a new poll, initialize with 2 default options
       form.resetFields();
+      form.setFieldsValue({
+        options: [
+          { optionContent: '' }, // First option
+          { optionContent: '' }, // Second option
+        ],
+      });
     }
   }, [visible, editingPoll, form]);
 
@@ -55,13 +55,15 @@ const PollForm: React.FC<PollFormProps> = ({ visible, onCancel, onSubmit, editin
         </Form.Item>
         <Form.List
           name="options"
-          rules={[{
-            validator: async (_, options) => {
-              if (!options || options.length < 2) {
-                return Promise.reject(new Error('Ən azı iki seçim olmalıdır'));
-              }
+          rules={[
+            {
+              validator: async (_, options) => {
+                if (!options || options.length < 2) {
+                  return Promise.reject(new Error('Ən azı iki seçim olmalıdır'));
+                }
+              },
             },
-          }]}
+          ]}
         >
           {(fields, { add, remove }, { errors }) => (
             <>

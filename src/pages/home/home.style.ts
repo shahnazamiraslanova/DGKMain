@@ -46,7 +46,6 @@ const styles = {
     adminDetailBox: {
       display: 'flex',
       flexDirection:'column',
-      // gridTemplateColumns: '1fr 1fr',
       gap: '15px',
       backgroundColor: '#f9f9f9',
       padding: '20px',

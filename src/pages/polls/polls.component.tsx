@@ -15,7 +15,7 @@ const PollsPage: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [viewVotesModalVisible, setViewVotesModalVisible] = useState<boolean>(false);
   const [editingPoll, setEditingPoll] = useState<Poll | null>(null);
-  const [voteDetails, setVoteDetails] = useState<Vote[]>([]);
+  const [voteDetails, setVoteDetails] = useState<any>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const token = localStorage.getItem("token");
 
@@ -93,18 +93,23 @@ const PollsPage: React.FC = () => {
         options: values.options.map(option => ({ content: option.optionContent })),
         firmIds: values.firms.map(firmId => parseInt(firmId, 10)),
       };
-
+    
       const url = isEditing
         ? 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Polls/EditPoll'
         : 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Polls/CreateNewPoll';
-
-      await axios.post(url, payload, {
+      
+      const method = isEditing ? "put" : "post";
+    
+      await axios({
+        method: method,
+        url: url,
+        data: payload,
         headers: {
-          accept: "application/json",
-          "api-key": token || "",
+          'Accept': 'application/json',
+          'api-key': token || '',
         },
       });
-
+    
       message.success(isEditing ? 'Sorğu redaktə olundu' : 'Sorğu yaradıldı');
       fetchPolls();
       setModalVisible(false);
@@ -118,7 +123,7 @@ const PollsPage: React.FC = () => {
   const handleViewVotes = async (id: number) => {
     setIsSubmitting(true);
     try {
-      const response = await axios.get(`https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Polls/GetPollVotesById?pollId=${id}`, {
+      const response = await axios.get(`https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Polls/GetPollVotesByAdmin?pollId=${id}`, {
         headers: {
           accept: "application/json",
           "api-key": token || "",
@@ -127,6 +132,8 @@ const PollsPage: React.FC = () => {
       
       setVoteDetails(response.data.data || []);
       setViewVotesModalVisible(true);
+      console.log(response.data.data);
+      
     } catch (error) {
       message.error('Sorğu nəticələri yüklənə bilmədi');
     } finally {
