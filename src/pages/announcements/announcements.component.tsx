@@ -3,7 +3,6 @@ import { createUseStyles } from 'react-jss';
 import styles from './announcements.style';
 import axios from 'axios';
 import { message } from 'antd';
-// import AnnouncementList from './AnnouncementList';
 
 
 import AnnouncementList from './components/AnnouncementList';
@@ -13,19 +12,19 @@ import SortControls from './components/SortControls';
 import PerPageControl from './components/PerPageControl';
 import Pagination from './components/Pagination';
 
-interface Announcement {
+interface AnnouncementMain {
   id: number;
   title: string;
   content: string;
   createdDate: Date;
-  files: [number]
+  files: [string]
 }
 
 const useStyles = createUseStyles(styles);
 
 const AnnouncementManagement: React.FC = () => {
   const classes = useStyles();
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcements, setAnnouncements] = useState<AnnouncementMain[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [announcementsPerPage, setAnnouncementsPerPage] = useState(5);

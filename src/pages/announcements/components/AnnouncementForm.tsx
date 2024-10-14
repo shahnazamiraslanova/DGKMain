@@ -10,6 +10,8 @@ const useStyles = createUseStyles(styles);
 interface AnnouncementFormProps {
   fetchAnnouncements: () => void;
   getHeaders: () => { accept: string; "api-key": string };
+  editingId:any;
+   setEditingId: (id: any) => void;
 }
 
 const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ fetchAnnouncements, getHeaders }) => {

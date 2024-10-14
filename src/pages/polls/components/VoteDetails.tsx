@@ -11,18 +11,17 @@ const VoteDetailsModal: React.FC<VoteDetailsModalProps> = ({ visible, onCancel, 
   const voteData = useMemo(() => {
     if (!voteDetails || !Array.isArray(voteDetails) || voteDetails.length === 0) return []; 
 
-    // The first object contains user details and their options
     const userDetails = voteDetails[0]; 
 
-    // Extract users and their options
+ 
     const users = userDetails?.user || []; 
-    const options = userDetails?.option || []; // Corrected from "options" to "option" based on your data structure
+    const options = userDetails?.option || []; 
 
     return users.map((user: any) => ({
-      key: user.userId, // Use "userId" as the unique key
+      key: user.userId, 
       name: user.name,
       surname: user.surname,
-      options: options.map((option: any) => option.optionContent).join(', ') || '', // Join the options into a single string
+      options: options.map((option: any) => option.optionContent).join(', ') || '', 
     }));
   }, [voteDetails]);
 

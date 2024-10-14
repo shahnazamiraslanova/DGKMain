@@ -13,13 +13,14 @@ interface Announcement {
   title: string;
   content: string;
   createdDate: Date;
-  files: string[];
+  files: [string]
 }
 
 interface AnnouncementListProps {
   announcements: Announcement[];
   fetchAnnouncements: () => void;
   getHeaders: () => { accept: string; "api-key": string };
+  setEditingId: (id: number | null) => void;
 }
 
 const AnnouncementList: React.FC<AnnouncementListProps> = ({
