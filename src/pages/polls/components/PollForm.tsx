@@ -10,19 +10,17 @@ const PollForm: React.FC<PollFormProps> = ({ visible, onCancel, onSubmit, editin
 
   useEffect(() => {
     if (visible && editingPoll) {
-      // For editing an existing poll, set the fields
       form.setFieldsValue({
         pollTitle: editingPoll.pollTitle,
         options: editingPoll.options.map((option: any) => ({ optionContent: option.optionContent })),
         firms: editingPoll.firms.map((firm: any) => firm.firmId),
       });
     } else {
-      // For creating a new poll, initialize with 2 default options
       form.resetFields();
       form.setFieldsValue({
         options: [
-          { optionContent: '' }, // First option
-          { optionContent: '' }, // Second option
+          { optionContent: '' }, 
+          { optionContent: '' }, 
         ],
       });
     }

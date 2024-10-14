@@ -6,6 +6,7 @@ import jwtDecode from "jwt-decode";
 import { GuideIcon } from "assets/images/icons/guide";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { Spin } from "antd";
 
 function HomeComponent() {
   const [adminData, setAdminData] = useState<any>(null);
@@ -62,7 +63,7 @@ function HomeComponent() {
   useEffect(() => {
     getAdminData();
   }, []);
-  console.log(adminData);
+
 
   return (
     <div className={homeMain}>
@@ -110,7 +111,9 @@ function HomeComponent() {
             </div>
           </div>
         ) : (
-          <p>Admin Datası yüklənir...</p>
+         
+            <Spin size="large" />
+          
         )}
       </div>
       <div className={guidesMain}>

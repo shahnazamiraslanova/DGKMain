@@ -132,7 +132,7 @@ const PollsPage: React.FC = () => {
       
       setVoteDetails(response.data.data || []);
       setViewVotesModalVisible(true);
-      console.log(response.data.data);
+     
       
     } catch (error) {
       message.error('Sorğu nəticələri yüklənə bilmədi');

@@ -68,12 +68,12 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
       formData.append('title', title || editingAnnouncement.title);
       formData.append('content', content || editingAnnouncement.content);
 
-      // Add existing files
+    
       editingAnnouncement.files.forEach((file) => {
-        formData.append('files', file); // Append existing files
+        formData.append('files', file); 
       });
 
-      // Add new uploaded images
+     
       editingImages.forEach((file) => {
         if (file.originFileObj) {
           formData.append('files', file.originFileObj as File);
@@ -103,7 +103,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
     setEditingAnnouncement(announcement);
     setTitle(announcement.title);
     setContent(announcement.content);
-    // Convert existing files to UploadFile format
+    
     setEditingImages(announcement.files.map((file, index) => ({
       uid: `existing-${index}`,
       name: `Existing Image ${index + 1}`,
@@ -122,7 +122,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
   const handleImageUpload: UploadProps['onChange'] = (info) => {
     let fileList = [...info.fileList];
     
-    // Combine existing images with new uploads
+    
     fileList = editingImages.filter(file => file.url).concat(fileList);
     
     setEditingImages(fileList);
@@ -165,7 +165,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
         </div>
       ))}
 
-      {/* Editing Modal */}
+      
       <Modal
         title="Düzəliş et"
         visible={!!editingAnnouncement}
@@ -198,7 +198,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
             multiple
             fileList={editingImages}
             onChange={handleImageUpload}
-            beforeUpload={() => false} // Prevent automatic upload
+            beforeUpload={() => false} 
           >
             <Button icon={<UploadOutlined />}>Şəkil əlavə et</Button>
           </Upload>

@@ -1,6 +1,7 @@
 import colors from 'assets/styles/abstracts/color';
 import { rem } from 'assets/styles/abstracts/functions';
 import { breakpoint } from 'assets/styles/abstracts/mixins';
+import { color } from 'framer-motion';
 
 import { createUseStyles } from 'react-jss';
 
@@ -123,6 +124,9 @@ const styles = {
         fontSize:'16px',
         color:'white'
 
+    },
+    warnMessages:{
+        color:'#fdfe65'
     },
     or: { color: colors.authSubtitleText, },
     invalidField: { border: '1px solid ' + colors.validationErrorColor, },

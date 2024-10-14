@@ -5,30 +5,26 @@ import { VoteDetailsModalProps } from '../polls';
 const { Text } = Typography;
 
 const VoteDetailsModal: React.FC<VoteDetailsModalProps> = ({ visible, onCancel, voteDetails }) => {
-  console.log("Vote Details:", voteDetails);
 
-  // Check if voteDetails is loaded
   const isLoading = !voteDetails;
 
   const voteData = useMemo(() => {
-    if (!voteDetails || !Array.isArray(voteDetails) || voteDetails.length === 0) return []; // Ensure voteDetails is a non-empty array
+    if (!voteDetails || !Array.isArray(voteDetails) || voteDetails.length === 0) return []; 
 
-    const userDetails = voteDetails[0]; // Access the first object
+    // The first object contains user details and their options
+    const userDetails = voteDetails[0]; 
 
-    // Extract user and options
-    const users = userDetails?.user || []; // User array
-    const options = userDetails?.options || []; // Options array
+    // Extract users and their options
+    const users = userDetails?.user || []; 
+    const options = userDetails?.option || []; // Corrected from "options" to "option" based on your data structure
 
-    // Combine user and options in one object
-    return users.map((user:any) => ({
-      key: user.userId,
+    return users.map((user: any) => ({
+      key: user.userId, // Use "userId" as the unique key
       name: user.name,
       surname: user.surname,
-      options: options.map((option:any) => option.optionContent).join(', ') || '', // Join all options
+      options: options.map((option: any) => option.optionContent).join(', ') || '', // Join the options into a single string
     }));
   }, [voteDetails]);
-
-  console.log("Vote Data:", voteData);
 
   const voteColumns = [
     { title: 'İstifadəçi', dataIndex: 'name', key: 'name' },
@@ -45,11 +41,10 @@ const VoteDetailsModal: React.FC<VoteDetailsModalProps> = ({ visible, onCancel, 
       width={800}
       aria-label="Vote Details Modal"
     >
-      {/* <Text strong style={{ marginTop: 16, display: 'block' }}>Səsvermə detalları:</Text> */}
       {isLoading ? (
         <div style={{ textAlign: 'center', marginTop: 20 }}>
           <Spin tip="Yüklənir..." />
-          <Text> məlumatlar yüklənir. Lütfən gözləyin...</Text>
+          <Text>məlumatlar yüklənir. Lütfən gözləyin...</Text>
         </div>
       ) : voteData.length > 0 ? (
         <Table

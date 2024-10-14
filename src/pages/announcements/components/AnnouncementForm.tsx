@@ -29,7 +29,7 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ fetchAnnouncements,
 
   const handleImageChange = (fileList: File[]) => {
     setNewAnnouncement(prev => ({ ...prev, images: [...prev.images, ...fileList] }));
-    return false; // Prevent automatic upload
+    return false; 
   };
 
   const handleImageDelete = (index: number) => {
@@ -42,7 +42,7 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ fetchAnnouncements,
 
   const handleSubmit = async (values: { title: string; content: string; }) => {
     if (newAnnouncement.images.length === 0) {
-      message.error('Şəkil seçilməlidir!'); // Validation message
+      message.error('Şəkil seçilməlidir!'); 
       return;
     }
 
@@ -62,9 +62,9 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ fetchAnnouncements,
         { headers: { ...getHeaders(), 'Content-Type': 'multipart/form-data' } }
       );
       message.success('Elan uğurla əlavə edildi');
-      setNewAnnouncement({ title: '', content: '', images: [] }); // Reset state after submission
+      setNewAnnouncement({ title: '', content: '', images: [] }); 
       fetchAnnouncements();
-      setIsModalVisible(false); // Close the modal after submit
+      setIsModalVisible(false); 
     } catch (error) {
       console.error('Error submitting announcement:', error);
       message.error('Elanı göndərmək mümkün olmadı');
@@ -119,9 +119,9 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ fetchAnnouncements,
           </Form.Item>
 
           <Upload
-            beforeUpload={(file) => { handleImageChange([file]); return false; }} // Allow multiple uploads
-            showUploadList={false} // Do not show the file list automatically
-            multiple // Allow multiple uploads
+            beforeUpload={(file) => { handleImageChange([file]); return false; }} 
+            showUploadList={false} 
+            multiple 
           >
             <Button icon={<UploadOutlined />}>Şəkil seç</Button>
           </Upload>

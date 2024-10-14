@@ -8,3 +8,15 @@
 *{
     flex-wrap: wrap;
 }
+
+:where(.css-dev-only-do-not-override-19a7szb).ant-btn-default {
+
+    margin-left: 5px;
+}
+:where(.css-dev-only-do-not-override-19a7szb).ant-select-single.ant-select-show-arrow .ant-select-selection-item, :where(.css-dev-only-do-not-override-19a7szb).ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder {
+   
+   overflow: hidden;
+}
+:where(.css-dev-only-do-not-override-19a7szb).ant-form-item .ant-form-item-control-input {
+    width: 100%;
+}

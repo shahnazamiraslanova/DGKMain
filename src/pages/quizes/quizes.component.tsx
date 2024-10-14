@@ -593,7 +593,7 @@ const QuizsComponent: React.FC = () => {
 
   const handleRemoveUser = async (groupId: any) => {
 
-    console.log(groupId, groupMembersToRemove);
+   
     
     try {
       await axios.delete(
@@ -633,7 +633,7 @@ const QuizsComponent: React.FC = () => {
         (quiz: any) => quiz.id !== quizId
       );
       setGenaratedQuizes(updatedQuizes);
-      message.success("Sual silindi");
+      message.success("Quiz çıxarıldı,saxla düyməsinə toxunmağı unutmayın");
     } catch (error) {
       message.error("Sual silinə bilmədi");
     }
@@ -796,9 +796,9 @@ const QuizsComponent: React.FC = () => {
           "api-key": token || "",
         },
       });
-      console.log(response.data);
       
-      setQuizResults(response.data); // Use response.data instead of response?.data
+      
+      setQuizResults(response.data); 
     } catch (error) {
       console.error("Error fetching quiz results:", error);
     }
@@ -867,7 +867,7 @@ const QuizsComponent: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <span className={classes.quizTitle}>{quiz.title}</span>
+                    <span className={classes.quizTitle}>{quiz.title.length>70 ? quiz.title.slice(0, 70)+ "..." : quiz.title}</span>
                     <Button
                       icon={<EditOutlined />}
                       onClick={(e) => handleEditClick(e, quiz.id, quiz.title)}
@@ -939,7 +939,7 @@ const QuizsComponent: React.FC = () => {
                   </Form.Item>
                   <Button
                     onClick={() => {
-                      handleCancel(); // Call the function
+                      handleCancel(); 
                       setOpenQuestionForms((prev) => ({
                         ...prev,
                         [quiz.id]: false,
@@ -1097,7 +1097,6 @@ const QuizsComponent: React.FC = () => {
                                     <span className={classes.optionContent}>
                                       {option.content}
                                     </span>
-                                    {/* Make sure Radio reflects the updated state */}
                                     <Radio checked={option.isTrue} disabled>
                                       Düzgünlük
                                     </Radio>
@@ -1105,7 +1104,7 @@ const QuizsComponent: React.FC = () => {
                                       icon={<EditOutlined />}
                                       onClick={() => {
                                         setEditingOptionId(option.id);
-                                        // Set form values when entering edit mode
+                                      
                                         questionForm.setFieldsValue({
                                           optionContent: option.content,
                                           isCorrect: option.isTrue,
@@ -1388,7 +1387,7 @@ const QuizsComponent: React.FC = () => {
           </Button>
         </div>
 
-        <div style={{ marginTop: "20px" }}>
+        <div style={{ marginTop: "20px", overflow:'hidden' }}>
           <h2 style={{ fontWeight: "600" }}>Təyin olunmuş quizlər</h2>
 
           {genaratedQuizes.length > 0
@@ -1428,7 +1427,7 @@ const QuizsComponent: React.FC = () => {
             key="save"
             type="primary"
             onClick={() => {
-              console.log(selectedGroup, selectedGroupMembers);
+         
               
            
               handleSaveNewUsers(selectedGroup);
@@ -1545,9 +1544,12 @@ const QuizsComponent: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     marginTop: "10px",
+                    overflow:'hidden'
                   }}
                 >
-                  <h3>{quiz.quizes.title + quiz.id}</h3>
+                  <h3   style={{
+                    width: "75%",
+                  }}>{quiz.quizes.title + quiz.id}</h3>
                   <Button
                     onClick={() => {
                       setIsSeeResultsModalVisible2(true);
@@ -1585,9 +1587,10 @@ const QuizsComponent: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     marginTop: "10px",
+                    
                   }}
                 >
-                  <h3>{result.name + result.surName}</h3>
+                  <h3>{result.name + result.surName }</h3>
                   
                 </div>
               ))

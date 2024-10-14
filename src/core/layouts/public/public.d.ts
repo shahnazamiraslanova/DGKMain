@@ -4,4 +4,3 @@ export interface ILeftMenuItemProps {
     icon: any;
     submenu: any;
 }
-

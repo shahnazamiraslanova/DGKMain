@@ -1,45 +1,151 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Form } from 'antd';
+import React, { useState, useEffect, ChangeEvent } from 'react';
+import { Button, Form, message } from 'antd';
 import { useLoginStyles } from './login.style';
 import logoMain from '../../assets/images/statics/LogoMain.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUsername, setPassword, setToken } from 'store/store.reducer';
 import axios from 'axios';
-import { toast } from 'react-toastify';
-import { getUsername, isTokenValid } from '../../core/helpers/get-token'; // Import the function to check token validity
+import { getUsername, isTokenValid } from '../../core/helpers/get-token';
 import { Routes } from 'router/routes';
 import { useNavigate } from 'react-router-dom';
+
+interface RootState {
+  username: string;
+  password: string;
+}
 
 const LoginComponent = () => {
   const OTP_URL = 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Account/get-otp';
   const LOGIN_URL = 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Account/sign-in';
-  const navigate = useNavigate();
-  const { panel, loginMain, logoImg, input, inputContainer, button, showPasswordButton, loginTitle, sendAgain, sendAgainText } = useLoginStyles();
+  const navigate = useNavigate(); // No custom type for useNavigate
+  const {
+    panel,
+    loginMain,
+    logoImg,
+    input,
+    inputContainer,
+    button,
+    showPasswordButton,
+    loginTitle,
+    sendAgain,
+    sendAgainText,
+    warnMessages,
+  } = useLoginStyles();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showOtpForm, setShowOtpForm] = useState(false);
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const username = useSelector((state: any) => state.username);
-  const password = useSelector((state: any) => state.password);
+  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
+  const [loading, setLoading] = useState(false);
+  const [cardLoading, setCardLoading] = useState(false);
+  const [cardData, setCardData] = useState<any>(null);
+  const username = useSelector((state: RootState) => state.username);
+  const password = useSelector((state: RootState) => state.password);
   const dispatch = useDispatch();
 
   const [usernameIsOk, setUsernameIsOk] = useState(true);
   const [passwordIsOk, setPasswordIsOk] = useState(true);
-  const [number, setNumber] = useState("");
+  const [number, setNumber] = useState('');
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken && isTokenValid(storedToken)) {
-      navigate(Routes.home); 
+      navigate(Routes.home);
     }
   }, [navigate]);
 
   useEffect(() => {
     const storedUsername = getUsername();
     if (storedUsername) {
+      dispatch(setUsername(storedUsername));
       setShowOtpForm(true);
     }
-  }, []);
+  }, [dispatch]);
+
+  const readCardData = async () => {
+    setCardLoading(true);
+    try {
+      const cardInfo = await getCardDataFromReader();
+      setCardData(cardInfo);
+      if (cardInfo?.username) {
+        dispatch(setUsername(cardInfo.username));
+        setShowOtpForm(true);
+      }
+    } catch (error) {
+      message.error('Card read failed, please try again');
+    } finally {
+      setCardLoading(false);
+    }
+  };
+  
+  
+// Modified getCardDataFromReader function
+const getCardDataFromReader = async () => {
+  try {
+    console.log('Requesting USB device...');
+
+    const device = await navigator.usb.requestDevice({
+      filters: [{ vendorId: 0x0bda, productId: 0x0165 }],
+    });
+
+    if (!device) {
+      console.error('No USB devices found.');
+      message.error('No USB devices found. Please check your connection.');
+      return;
+    }
+
+    console.log('Device selected: ', device);
+
+    try {
+      await device.open();
+      console.log('Device opened successfully');
+      
+      await device.selectConfiguration(1);
+      console.log('Configuration selected');
+      
+      await device.claimInterface(0);
+      console.log('Interface claimed');
+
+      const cardInfo = await readDataFromCard(device);
+
+      await device.close();
+      console.log('Device closed');
+
+      console.log('Card data: ', cardInfo);
+      return cardInfo;
+    } catch (securityError) {
+      console.error('Error details:', securityError);
+      if (securityError instanceof DOMException && securityError.name === 'SecurityError') {
+        console.error('Failed to open the device: Access denied.');
+        message.error('Access denied. Please ensure the device is properly connected and allowed in your browser settings.');
+      } else {
+        console.error('Unexpected error:', securityError);
+        message.error('Unexpected error occurred. Please try again.');
+      }
+    }
+  } catch (error) {
+    console.error('Failed to read card data:', error);
+    message.error('Failed to communicate with the card reader. Please check your device and browser permissions.');
+  }
+};
+
+  const readDataFromCard = async (device: any) => {
+    try {
+      const result = await device.transferIn(1, 64);
+
+      console.log('Received data:', result.data);
+
+      const textDecoder = new TextDecoder();
+      const decodedData = textDecoder.decode(result.data);
+
+      return {
+        username: decodedData,
+        certificate: 'cardCert456',
+      };
+    } catch (error) {
+      console.error('Error reading data from card:', error);
+      throw new Error('Failed to read card data');
+    }
+  };
 
   const loginFun = async () => {
     const usernameValid = username.trim() !== '';
@@ -49,25 +155,24 @@ const LoginComponent = () => {
     setPasswordIsOk(passwordValid);
 
     if (usernameValid && passwordValid) {
+      setLoading(true);
       try {
         const response = await axios.post(OTP_URL, { username, password });
 
         if (response.data) {
           localStorage.setItem('username', username);
           setShowOtpForm(true);
-          setNumber(response.data.data); 
-        } else {
-       console.log("salam");
-       
+          setNumber(response.data.data);
         }
       } catch (error) {
-        console.log("salam");
-        
+        message.error('İstifadəçi adı və ya şifrə yanlışdır');
+      } finally {
+        setLoading(false);
       }
     }
   };
 
-  const handleOtpChange = (index: number, value: any) => {
+  const handleOtpChange = (index: number, value: string) => {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
@@ -80,18 +185,19 @@ const LoginComponent = () => {
   const handleOtpSubmit = async () => {
     const otpCode = otp.join('');
     if (otpCode.length === 6) {
+      setLoading(true);
       try {
         const response = await axios.post(LOGIN_URL, { username, password, otpCode });
 
         if (response.data) {
           localStorage.setItem('token', response.data.data);
           dispatch(setToken(response.data.data));
-     
-          navigate(Routes.home); 
-        } 
+          navigate(Routes.home);
+        }
       } catch (error) {
-        console.log(error);
-        
+        message.error('OTP doğrulama uğursuz oldu');
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -107,20 +213,24 @@ const LoginComponent = () => {
               <input
                 key={index}
                 id={`otp-${index}`}
-                type="text"
+                type='text'
                 value={digit}
-                onChange={(e) => handleOtpChange(index, e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => handleOtpChange(index, e.target.value)}
                 className={input}
                 style={{ width: '40px', textAlign: 'center' }}
+                maxLength={1}
               />
             ))}
           </div>
-          <Button onClick={handleOtpSubmit} className={button}>
+          <Button onClick={handleOtpSubmit} className={button} loading={loading} disabled={loading}>
             Təsdiq Et
           </Button>
           {number && <p className={sendAgainText}>******{number.slice(6)} nömrəsinə kod göndərildi</p>}
           <p className={sendAgainText}>
-            Kodu əldə etmədim, <button onClick={loginFun} className={sendAgain}> yenidən göndər</button>
+            Kodu əldə etmədim,{' '}
+            <button onClick={loginFun} className={sendAgain}>
+              yenidən göndər
+            </button>
           </p>
         </div>
       </div>
@@ -131,11 +241,7 @@ const LoginComponent = () => {
     <div className={loginMain}>
       <img className={logoImg} src={logoMain} alt='Logo' />
       <div className={panel}>
-        <Form
-          name='login'
-          initialValues={{ username: '', password: '' }}
-          layout='vertical'
-        >
+        <Form name='login' initialValues={{ username: '', password: '' }} layout='vertical'>
           <p className={loginTitle}>Daxil olun</p>
           <div className={inputContainer}>
             <input
@@ -146,7 +252,7 @@ const LoginComponent = () => {
               value={username}
               onChange={(e) => dispatch(setUsername(e.target.value))}
             />
-            {!usernameIsOk && <span className="warn">Username is required</span>}
+            {!usernameIsOk && <span className={warnMessages}>Username is required</span>}
           </div>
           <div className={inputContainer}>
             <input
@@ -157,7 +263,7 @@ const LoginComponent = () => {
               value={password}
               onChange={(e) => dispatch(setPassword(e.target.value))}
             />
-            {!passwordIsOk && <span className="warn">Password is required</span>}
+            {!passwordIsOk && <span className={warnMessages}>Password is required</span>}
             <button
               type='button'
               className={showPasswordButton}
@@ -166,8 +272,11 @@ const LoginComponent = () => {
               {showPassword ? 'Hide' : 'Show'}
             </button>
           </div>
-          <Button onClick={loginFun} className={button} htmlType='submit'>
+          <Button onClick={loginFun} className={button} loading={loading} disabled={loading}>
             Daxil ol
+          </Button>
+          <Button onClick={readCardData} className={button} loading={cardLoading} disabled={cardLoading} style={{marginTop:'10px'}}>
+            Kartla daxil ol
           </Button>
         </Form>
       </div>
