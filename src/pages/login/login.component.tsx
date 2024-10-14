@@ -17,7 +17,7 @@ interface RootState {
 const LoginComponent = () => {
   const OTP_URL = 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Account/get-otp';
   const LOGIN_URL = 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Account/sign-in';
-  const navigate = useNavigate(); // No custom type for useNavigate
+  const navigate = useNavigate(); 
   const {
     panel,
     loginMain,
