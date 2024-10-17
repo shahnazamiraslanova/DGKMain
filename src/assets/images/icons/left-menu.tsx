@@ -101,3 +101,29 @@ export const PollIcon = () => {
 };
 
 
+export const LegisIcon = () => {
+  return (
+   
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <g fill="none" stroke="#000000" stroke-width="3">
+      
+      <rect x="15" y="80" width="70" height="10" fill="#000000"/>
+   
+      <line x1="50" y1="10" x2="50" y2="80" stroke="#000000"/>
+      
+      <circle cx="30" cy="30" r="10" stroke="#000000" stroke-width="3"/>
+      <line x1="30" y1="30" x2="30" y2="50" stroke="#000000" stroke-width="3"/>
+      
+     
+      <circle cx="70" cy="30" r="10" stroke="#000000" stroke-width="3"/>
+      <line x1="70" y1="30" x2="70" y2="50" stroke="#000000" stroke-width="3"/>
+      
+     
+      <line x1="20" y1="10" x2="80" y2="10" stroke="#000000" stroke-width="3"/>
+    </g>
+  </svg>
+  
+
+  
+  );
+};

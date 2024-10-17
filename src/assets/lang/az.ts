@@ -9,6 +9,7 @@ export const az = {
     quiz_title: 'Quizlər',
     poll_title:'Sorğular',
     setting_title:'Tənzimləmələr',
+    legislation_title:"Qanunvericilik",
 
     // errors
     input_required: 'Bu xana mütləqdir',

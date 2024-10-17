@@ -65,13 +65,17 @@ const LoginComponent = () => {
     setCardLoading(true);
     try {
       const cardInfo = await getCardDataFromReader();
-      setCardData(cardInfo);
+      console.log(cardInfo);
+      
       if (cardInfo?.username) {
         dispatch(setUsername(cardInfo.username));
         setShowOtpForm(true);
+      } else {
+        message.error('Card does not contain valid user information');
       }
     } catch (error) {
-      message.error('Card read failed, please try again');
+      console.error('Card reading error:', error);
+      message.error('Failed to read card. Please ensure the card is inserted and accessible.');
     } finally {
       setCardLoading(false);
     }

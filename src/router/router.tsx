@@ -10,6 +10,7 @@ import AuthProtectedComponent from './protected/auth-protected.component';
 import AnnouncementComponent from 'pages/announcements/announcements.component';
 import QuizesComponent from 'pages/quizes/quizes.component';
 import PollsComponent from 'pages/polls/polls.component';
+import LegislationsComponent from 'pages/legislations/legislations.component';
 
 
 const router = createBrowserRouter([
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
             {
                 path: Routes.poll,
                 element: <PollsComponent/>,
+            },
+            {
+                path: Routes.legislation,
+                element: <LegislationsComponent/>,
             }
         ],
     },
