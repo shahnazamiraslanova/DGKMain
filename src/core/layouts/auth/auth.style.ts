@@ -5,22 +5,7 @@ const styles = {
 
     },
 
-    // section: {
-    //     minHeight: '100vh',
-    // },
-    // wrapper: {
-    //     minHeight: '100vh',
-    //     width: '100%',
-    //     display: 'flex',
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    //     flexDirection: 'column',
-    // },
-    // pageSection: {
-    // },
-    // panel: {width: rem(480),},
-    // or: {color: colors.authSubtitleText,},
-    // invalidField: {border: '1px solid ' + colors.validationErrorColor,},
+    
 };
 
 

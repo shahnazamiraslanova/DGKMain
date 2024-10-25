@@ -5,6 +5,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
 import styles from "../announcements.style";
 import axios from "axios";
+import { BASE_URL } from "baseInfos";
 
 const useStyles = createUseStyles(styles);
 
@@ -37,7 +38,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
   const handleDelete = async (id: number) => {
     try {
       const response = await axios.delete(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Announcements/DeleteAnnouncement?id=${id}`,
+        `${BASE_URL}/api/v1/Announcements/DeleteAnnouncement?id=${id}`,
         { headers: getHeaders() }
       );
 
@@ -69,21 +70,37 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
       formData.append('title', title || editingAnnouncement.title);
       formData.append('content', content || editingAnnouncement.content);
 
-    
-      editingAnnouncement.files.forEach((file) => {
-        formData.append('files', file); 
-      });
-
-     
-      editingImages.forEach((file) => {
-        if (file.originFileObj) {
-          formData.append('files', file.originFileObj as File);
-        }
-      });
+      // Check if there are any new file uploads
+      const newImages = editingImages.filter(file => file.originFileObj);
+      
+      if (newImages.length > 0) {
+        // If there are new images, append them
+        newImages.forEach(file => {
+          if (file.originFileObj) {
+            formData.append('Files', file.originFileObj);
+          }
+        });
+      } else {
+        // If no new images, append the existing files
+        editingAnnouncement.files.forEach(file => {
+          // Create a file blob from base64
+          const byteCharacters = atob(file);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: 'image/jpeg' });
+          
+          // Create a File object from the blob
+          const fileFromBlob = new File([blob], 'image.jpg', { type: 'image/jpeg' });
+          formData.append('Files', fileFromBlob);
+        });
+      }
 
       try {
         const response = await axios.put(
-          `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Announcements/EditAnnouncement`,
+          `${BASE_URL}/api/v1/Announcements/EditAnnouncement`,
           formData,
           { headers: { ...getHeaders(), 'Content-Type': 'multipart/form-data' } }
         );
@@ -92,6 +109,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
           message.success("Elan uğurla yeniləndi");
           setEditingAnnouncement(null);
           fetchAnnouncements();
+          closeEditModal();
         }
       } catch (error) {
         console.error("Error updating announcement:", error);
@@ -123,7 +141,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
   const handleImageUpload: UploadProps['onChange'] = (info) => {
     let fileList = [...info.fileList];
     
-    
+    // Preserve existing images
     fileList = editingImages.filter(file => file.url).concat(fileList);
     
     setEditingImages(fileList);
@@ -166,7 +184,6 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
         </div>
       ))}
 
-      
       <Modal
         title="Düzəliş et"
         visible={!!editingAnnouncement}
@@ -199,7 +216,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
             multiple
             fileList={editingImages}
             onChange={handleImageUpload}
-            beforeUpload={() => false} 
+            beforeUpload={() => false}
           >
             <Button icon={<UploadOutlined />}>Şəkil əlavə et</Button>
           </Upload>

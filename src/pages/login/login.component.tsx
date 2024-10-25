@@ -8,6 +8,7 @@ import axios from 'axios';
 import { getUsername, isTokenValid } from '../../core/helpers/get-token';
 import { Routes } from 'router/routes';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from 'baseInfos';
 
 interface RootState {
   username: string;
@@ -15,8 +16,8 @@ interface RootState {
 }
 
 const LoginComponent = () => {
-  const OTP_URL = 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Account/get-otp';
-  const LOGIN_URL = 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Account/sign-in';
+  const OTP_URL = 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535';
+  const LOGIN_URL = 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535';
   const navigate = useNavigate(); 
   const {
     panel,
@@ -161,7 +162,7 @@ const getCardDataFromReader = async () => {
     if (usernameValid && passwordValid) {
       setLoading(true);
       try {
-        const response = await axios.post(OTP_URL, { username, password });
+        const response = await axios.post(`${BASE_URL}/api/Account/get-otp`, { username, password });
 
         if (response.data) {
           localStorage.setItem('username', username);
@@ -191,7 +192,7 @@ const getCardDataFromReader = async () => {
     if (otpCode.length === 6) {
       setLoading(true);
       try {
-        const response = await axios.post(LOGIN_URL, { username, password, otpCode });
+        const response = await axios.post(`${BASE_URL}/api/Account/sign-in`, { username, password, otpCode });
 
         if (response.data) {
           localStorage.setItem('token', response.data.data);

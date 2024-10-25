@@ -7,6 +7,7 @@ import PollList from './components/PollList';
 import PollForm from './components/PollForm';
 import VoteDetailsModal from './components/VoteDetails';
 import { Poll, Option, Firm, Vote } from './polls';
+import { BASE_URL, getHeaders } from 'baseInfos';
 
 const PollsPage: React.FC = () => {
   const [polls, setPolls] = useState<Poll[]>([]);
@@ -28,11 +29,8 @@ const PollsPage: React.FC = () => {
 
   const fetchPolls = async () => {
     try {
-      const response = await axios.get('https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Polls/GetpollsByAdmin', {
-        headers: {
-          accept: "application/json",
-          "api-key": token || "",
-        },
+      const response = await axios.get(`${BASE_URL}/api/v1/Polls/GetpollsByAdmin`, {
+        headers: getHeaders(),
       });
       setPolls(response.data.data);
     } catch (error) {
@@ -44,11 +42,8 @@ const PollsPage: React.FC = () => {
 
   const fetchFirms = async () => {
     try {
-      const response = await axios.get('https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Firm/GetAllFirm', {
-        headers: {
-          accept: "application/json",
-          "api-key": token || "",
-        },
+      const response = await axios.get(`${BASE_URL}/api/Firm/GetAllFirm`, {
+        headers: getHeaders(),
       });
       setFirms(response.data.data);
     } catch (error) {
@@ -69,11 +64,8 @@ const PollsPage: React.FC = () => {
   const handleDelete = async (id: number) => {
     setIsSubmitting(true);
     try {
-      await axios.delete(`https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Polls/DeletePoll?id=${id}`, {
-        headers: {
-          accept: "application/json",
-          "api-key": token || "",
-        },
+      await axios.delete(`${BASE_URL}/api/v1/Polls/DeletePoll?id=${id}`, {
+        headers: getHeaders(),
       });
       setPolls(prevPolls => prevPolls.filter((poll) => poll.pollId !== id));
       message.success('Sorğu silindi');
@@ -95,8 +87,8 @@ const PollsPage: React.FC = () => {
       };
     
       const url = isEditing
-        ? 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Polls/EditPoll'
-        : 'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Polls/CreateNewPoll';
+        ? `${BASE_URL}/api/v1/Polls/EditPoll`
+        : `${BASE_URL}/api/v1/Polls/CreateNewPoll`;
       
       const method = isEditing ? "put" : "post";
     
@@ -104,10 +96,7 @@ const PollsPage: React.FC = () => {
         method: method,
         url: url,
         data: payload,
-        headers: {
-          'Accept': 'application/json',
-          'api-key': token || '',
-        },
+        headers: getHeaders()
       });
     
       message.success(isEditing ? 'Sorğu redaktə olundu' : 'Sorğu yaradıldı');
@@ -123,11 +112,8 @@ const PollsPage: React.FC = () => {
   const handleViewVotes = async (id: number) => {
     setIsSubmitting(true);
     try {
-      const response = await axios.get(`https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Polls/GetPollVotesByAdmin?pollId=${id}`, {
-        headers: {
-          accept: "application/json",
-          "api-key": token || "",
-        },
+      const response = await axios.get(`${BASE_URL}/api/v1/Polls/GetPollVotesByAdmin?pollId=${id}`, {
+        headers: getHeaders(),
       });
       
       setVoteDetails(response.data.data || []);

@@ -1,10 +1,10 @@
 import { createUseStyles } from 'react-jss';
 
-const mainColor = '#394e75';
-const lightColor = '#eef1f6';
-const accentColor = '#5a7cb6';
-const successColor = '#4caf50';
-const dangerColor = '#f44336';
+export const mainColor = '#394e75';
+export const lightColor = '#eef1f6';
+export const accentColor = '#5a7cb6';
+export const successColor = '#4caf50';
+export const dangerColor = '#f44336';
 
 const styles = {
 

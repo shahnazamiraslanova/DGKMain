@@ -11,6 +11,7 @@ import SearchBar from './components/SearchBar';
 import SortControls from './components/SortControls';
 import PerPageControl from './components/PerPageControl';
 import Pagination from './components/Pagination';
+import { BASE_URL, getHeaders } from 'baseInfos';
 
 interface AnnouncementMain {
   id: number;
@@ -32,17 +33,14 @@ const AnnouncementManagement: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  const token = localStorage.getItem('token');
 
-  const getHeaders = () => ({
-    accept: "application/json",
-    "api-key": token || "",
-  });
+
+
 
   const fetchAnnouncements = async () => {
     try {
       const response = await axios.get(
-        'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Announcements/GetAnnouncemets',
+        `${BASE_URL}/api/v1/Announcements/GetAnnouncemets`,
         { headers: getHeaders() }
       );
       setAnnouncements(response.data.data);

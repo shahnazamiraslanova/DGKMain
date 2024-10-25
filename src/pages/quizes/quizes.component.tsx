@@ -35,6 +35,7 @@ import {
   ISelectedUser,
   IUser,
 } from "./quizes";
+import { BASE_URL, getHeaders } from "baseInfos";
 
 const QuizsComponent: React.FC = () => {
   const classes = useQuizStyles();
@@ -99,7 +100,8 @@ const QuizsComponent: React.FC = () => {
   const [groupMembersToRemove, setGroupMemberstoRemove] = useState<any>([]);
   const [genaratedQuizes, setGenaratedQuizes] = useState([]);
   const [quizResults, setQuizResults] = useState([]);
-
+  const [fetchedQuizIds, setFetchedQuizIds] = useState<Set<number>>(new Set());
+  const [fetchedQuestionIds, setFetchedQuestionIds] = useState<Set<number>>(new Set());
   // GET REQUESTS
 
 
@@ -111,12 +113,9 @@ const QuizsComponent: React.FC = () => {
   const fetchQuizResults = async (quizId: number) => {
     try {
       const response = await axios.get(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllUserResultByGeneratedQuizId/${quizId}`,
+        `${BASE_URL}/api/Quiz/GetAllUserResultByGeneratedQuizId/${quizId}`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers:getHeaders(),
         }
       );
       setQuizResults(response.data.data || []);
@@ -128,12 +127,9 @@ const QuizsComponent: React.FC = () => {
   const getQuizzes = useCallback(async () => {
     try {
       const response = await axios.get(
-        "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllQuiz",
+        `${BASE_URL}/api/Quiz/GetAllQuiz`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers:getHeaders(),
         }
       );
       setQuizzes(response.data.data);
@@ -145,12 +141,9 @@ const QuizsComponent: React.FC = () => {
   const fetchUsersByName = async (userFullName: string) => {
     try {
       const response = await axios.get(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllUserByUserId/${userFullName}`,
+        `${BASE_URL}/api/Quiz/GetAllUserByUserId/${userFullName}`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token,
-          },
+          headers:getHeaders(),
         }
       );
  
@@ -164,12 +157,9 @@ const QuizsComponent: React.FC = () => {
   const getGroups = useCallback(async () => {
     try {
       const response = await axios.get(
-        "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllGroupByUserId",
+        `${BASE_URL}/api/Quiz/GetAllGroupByUserId`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
       setGroups(response.data.data);
@@ -187,12 +177,9 @@ const QuizsComponent: React.FC = () => {
     setLoadingQuestions((prev) => ({ ...prev, [quizId]: true }));
     try {
       const response = await axios.get(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllQuestionByQuizId/${quizId}`,
+        `${BASE_URL}/api/Quiz/GetAllQuestionByQuizId/${quizId}`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
       setQuestionsByQuiz((prev) => ({ ...prev, [quizId]: response.data.data }));
@@ -207,12 +194,9 @@ const QuizsComponent: React.FC = () => {
     setLoadingOptions((prev) => ({ ...prev, [questionId]: true }));
     try {
       const response = await axios.get(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllAnswerByQuestionId/${questionId}`,
+        `${BASE_URL}/api/Quiz/GetAllAnswerByQuestionId/${questionId}`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
       setOptionsByQuestion((prev) => ({
@@ -228,12 +212,9 @@ const QuizsComponent: React.FC = () => {
   const getMembers = async (groupId: any) => {
     try {
       const response = await axios.get(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllGroupMemberById/${groupId}`,
+        `${BASE_URL}/api/Quiz/GetAllGroupMemberById/${groupId}`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders()
         }
       );
       setSelectedGroupMembers(response.data.data);
@@ -244,12 +225,9 @@ const QuizsComponent: React.FC = () => {
   const getAllgeneratedQuizesByGroupId = async (groupId: any) => {
     try {
       const response = await axios.get(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllGeneratedQuizByGroupId/${groupId}`,
+        `${BASE_URL}/api/Quiz/GetAllGeneratedQuizByGroupId/${groupId}`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
 
@@ -271,13 +249,10 @@ const QuizsComponent: React.FC = () => {
       }
 
       const response = await axios.post(
-        "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/CreateQuiz",
+        `${BASE_URL}/api/Quiz/CreateQuiz`,
         { title: values.quizTitle },
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
 
@@ -298,17 +273,14 @@ const QuizsComponent: React.FC = () => {
       }));
 
       const response = await axios.post(
-        "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/CreateQuizQuestionAndAnswers",
+        `${BASE_URL}/api/Quiz/CreateQuizQuestionAndAnswers`,
         {
           quizId: quizId,
           content: values.questionTitle,
           createQuizQuestionAndAnswerDtos: options,
         },
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers:getHeaders(),
         }
       );
 
@@ -325,7 +297,7 @@ const QuizsComponent: React.FC = () => {
   const handleAssignQuiz = async (values: any) => {
     try {
       await axios.post(
-        "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GenerateQuiz",
+        `${BASE_URL}/api/Quiz/GenerateQuiz`,
         {
           id: selectedQuiz,
           // userId: localStorage.getItem("inspectorId"),
@@ -336,10 +308,7 @@ const QuizsComponent: React.FC = () => {
           isRejoinable: values.isRejoinable,
         },
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
 
@@ -356,17 +325,14 @@ const QuizsComponent: React.FC = () => {
       const userIds = selectedUsers.map((user) => user?.id);
 
       const response = await axios.post(
-        "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/CreateQuizGroup",
+        `${BASE_URL}/api/Quiz/CreateQuizGroup`,
         {
           title: values.groupTitle,
           createdByUserId: localStorage.getItem("inspectorId"),
           quizGroupMemberIds: [...userIds],
         },
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
 
@@ -385,13 +351,10 @@ const QuizsComponent: React.FC = () => {
     event.stopPropagation();
     try {
       await axios.put(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizTitle`,
+        `${BASE_URL}/api/Quiz/UpdateQuizTitle`,
         { id, title: editTitle },
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers:getHeaders(),
         }
       );
 
@@ -416,13 +379,10 @@ const QuizsComponent: React.FC = () => {
     
     try {
       await axios.put(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizGroupTitle`,
+        `${BASE_URL}/api/Quiz/UpdateQuizGroupTitle`,
         { id, title: newTitle },
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
 
@@ -447,17 +407,14 @@ const QuizsComponent: React.FC = () => {
   
       // Make the API request to update the question
       const response = await axios.put(
-        "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizQuestion",
+        `${BASE_URL}/api/Quiz/UpdateQuizQuestion`,
         {
           id: questionId,
           content: values.questionTitle,
           updateQuizQuestionAnswerDtos: options,
         },
         {
-          headers: {
-            Accept: "application/json",
-            "api-key": token || "",  
-          },
+          headers: getHeaders(),
         }
       );
   
@@ -490,7 +447,7 @@ const QuizsComponent: React.FC = () => {
       const values = await questionForm.validateFields();
 
       const response = await axios.put(
-        "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizQuestionAnswer",
+        `${BASE_URL}/api/Quiz/UpdateQuizQuestionAnswer`,
         {
           id: optionId,
           questionId: questionId,
@@ -498,10 +455,7 @@ const QuizsComponent: React.FC = () => {
           isTrue: values.isCorrect,
         },
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
 
@@ -536,12 +490,9 @@ const QuizsComponent: React.FC = () => {
     event.stopPropagation();
     try {
       await axios.delete(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/DeleteQuizById/${id}`,
+        `${BASE_URL}/api/Quiz/DeleteQuizById/${id}`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
       setQuizzes((prevQuizzes) => prevQuizzes.filter((quiz) => quiz.id !== id));
@@ -553,12 +504,9 @@ const QuizsComponent: React.FC = () => {
   const handleDeleteQuestion = async (questionId: number, quizId: number) => {
     try {
       await axios.delete(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/DeleteQuizQuestionById/${questionId}`,
+        `${BASE_URL}/api/Quiz/DeleteQuizQuestionById/${questionId}`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders(),
         }
       );
       setQuestionsByQuiz((prev) => ({
@@ -574,12 +522,9 @@ const QuizsComponent: React.FC = () => {
   const handleDeleteGroup = async (groupId: number) => {
     try {
       await axios.delete(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/DeleteGroupById/${groupId}`,
+        `${BASE_URL}/api/Quiz/DeleteGroupById/${groupId}`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers:getHeaders(),
         }
       );
       setGroups((prevGroups) =>
@@ -597,17 +542,14 @@ const QuizsComponent: React.FC = () => {
     
     try {
       await axios.delete(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/DeleteQuizGroupMember`,
+        `${BASE_URL}/api/Quiz/DeleteQuizGroupMember`,
         {
           data: {
             // userId:localStorage.getItem('inspectorId'),
             groupId: groupId,
             quizGroupMemberIds: groupMembersToRemove,
           },
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers:getHeaders(),
         }
       );
       setGroupMemberstoRemove([]);
@@ -621,12 +563,9 @@ const QuizsComponent: React.FC = () => {
   const deleteGenaratedQuiz = async (quizId: any) => {
     try {
       await axios.delete(
-        `https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/DeleteGeneratedQuizById/${quizId}`,
+        `${BASE_URL}/api/Quiz/DeleteGeneratedQuizById/${quizId}`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers:getHeaders(),
         }
       );
       const updatedQuizes = genaratedQuizes.filter(
@@ -707,12 +646,10 @@ const QuizsComponent: React.FC = () => {
     
     
     confirm({
-      // title: "Bu adı daşıyan qrup artıq var",
       content: content,
       okText: "Bəli",
       cancelText: "Xeyr",
       onOk() {
-        // proceedWithGroupCreation(values);
         ourFunction();
       },
     });
@@ -762,16 +699,13 @@ const QuizsComponent: React.FC = () => {
 
     try {
       await axios.put(
-        "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/UpdateQuizGroupMember",
+        `${BASE_URL}/api/Quiz/UpdateQuizGroupMember`,
         {
           groupId: groupId,
           quizGroupMemberIds: quizGroupMemberIds,
         },
         {
-          headers: {
-            accept: "application/json",
-            "api-key": token || "",
-          },
+          headers: getHeaders()
         }
       );
       message.success("New users added successfully");
@@ -790,11 +724,8 @@ const QuizsComponent: React.FC = () => {
 
   const showResultOfGeneratedQuiz = async (quizId: any) => {
     try {
-      const response = await axios.get(`https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Quiz/GetAllUserResultByGeneratedQuizId/${quizId}`, {
-        headers: {
-          accept: "application/json",
-          "api-key": token || "",
-        },
+      const response = await axios.get(`${BASE_URL}/api/Quiz/GetAllUserResultByGeneratedQuizId/${quizId}`, {
+        headers: getHeaders(),
       });
       
       

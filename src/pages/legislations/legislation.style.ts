@@ -1,25 +1,73 @@
-import { createUseStyles } from "react-jss";
-
-const mainColor = "#394e75";
-const lightColor = "#eef1f6";
-const accentColor = "#5a7cb6";
-const successColor = "#4caf50";
-const dangerColor = "#f44336";
+import { accentColor, lightColor, mainColor } from 'pages/quizes/quizes.style';
+import { createUseStyles } from 'react-jss';
 
 const styles = {
   legislationContainer: {
-    backgroundColor: "#f0f2f5",
-    padding: "150px 40px 0 40px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+    width:"100%",
+    // margin: '1500px auto',
+    padding: '150px 40px 0 40px',
   },
-  legisationBtns: {
-    display: "flex",
-    justifyContent: "space-between",
+  legislationButtons: {
+    display: 'flex',
+    // justifyContent: 'space-between',
+    gap:'20px',
+    marginBottom: '2rem',
   },
-  listContainer:{
-    
-  }
+  actionButton: {
+    backgroundColor: mainColor,
+    color: 'white',
+    border: 'none',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '4px',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      backgroundColor: accentColor,
+      transform: 'translateY(-2px)',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    },
+  },
+  createSectionModal: {
+    '& .ant-modal-body': {
+      justifyContent:'end'
+    },
+  },
+  submitButton: {
+    marginRight: 10,
+  },
+  loadingSpinner: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 200,
+  },
+  sectionsContainer: {
+    borderRadius: 8,
+  },
+  collapse: {
+    backgroundColor: '#ffffff',
+  },
+  panel: {
+    marginBottom: 8,
+    border: '1px solid #d9d9d9',
+    borderRadius: 4,
+  },
+  panelHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  editButton: {
+    marginLeft: 8,
+  },
+  deleteButton: {
+    marginLeft: 8,
+  },
+  collapseContent: {
+    backgroundColor: '#fafafa',
+  },
+  collapseContentBox: {
+    padding: 16,
+  },
 };
 
-export const useLegislationStyles = createUseStyles(styles);
+export const useLegisStyle = createUseStyles(styles);

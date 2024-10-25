@@ -7,6 +7,7 @@ import { GuideIcon } from "assets/images/icons/guide";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Spin } from "antd";
+import { BASE_URL, getHeaders } from "baseInfos";
 
 function HomeComponent() {
   const [adminData, setAdminData] = useState<any>(null);
@@ -46,12 +47,9 @@ function HomeComponent() {
   const getAdminData = async () => {
     try {
       const response = await axios.get(
-        "https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/Account/user-data",
+        `${BASE_URL}/api/Account/user-data`,
         {
-          headers: {
-            accept: "application/json",
-            "api-key": storedToken || "",
-          },
+          headers: getHeaders(),
         }
       );
       setAdminData(response.data.data);

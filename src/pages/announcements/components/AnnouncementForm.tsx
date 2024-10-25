@@ -4,6 +4,7 @@ import styles from '../announcements.style';
 import axios from 'axios';
 import { message, Modal, Button, Upload, Form } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import { BASE_URL } from 'baseInfos';
 
 const useStyles = createUseStyles(styles);
 
@@ -59,7 +60,7 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ fetchAnnouncements,
 
     try {
       await axios.post(
-        'https://tc2c-fvaisoutbusiness.customs.gov.az:3535/api/v1/Announcements/CreateAnnouncement',
+        `${BASE_URL}/api/v1/Announcements/CreateAnnouncement`,
         formData,
         { headers: { ...getHeaders(), 'Content-Type': 'multipart/form-data' } }
       );
