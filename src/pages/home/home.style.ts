@@ -20,7 +20,7 @@ const styles = {
         marginBottom: '20px',
     },
     adminInfo: {
-      width: '50%',
+      width: '60%',
     },
     guides: {
       display: 'flex',
@@ -73,17 +73,27 @@ const styles = {
       height:'220px'
     },
     infoHeader:{
-      height:'250px',
+      // maxHeight:'250px',
       display:'flex',
       justifyContent:'space-between',
-      alignItems:'center'
+      alignItems:'center',
+
+
+      '@media (min-width: 1200px)': {
+        maxHeight:'250px',
+      },
     },
+
+
     adminHeaderLeft:{
       width:'65%',
       display:'flex',
       flexDirection:'column',
-      gap:'20px'
-
+      gap:'20px',
+      '@media (max-width: 1200px)': {
+        marginTop:'20px',
+        width:'100%',
+      },
     }
   };
   

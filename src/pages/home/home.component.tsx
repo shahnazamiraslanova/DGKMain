@@ -8,7 +8,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Spin } from "antd";
 import { BASE_URL, getHeaders } from "baseInfos";
-
+import profilPicture from "../../assets/images/statics/profil.jpg";
 function HomeComponent() {
   const [adminData, setAdminData] = useState<any>(null);
   const {
@@ -75,7 +75,7 @@ function HomeComponent() {
                 src={
                   adminData.image
                     ? "data:image/jpeg;base64,"+adminData.image
-                    : "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+                    : profilPicture
                 }
                 alt=""
               />

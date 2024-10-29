@@ -280,9 +280,9 @@ const getCardDataFromReader = async () => {
           <Button onClick={loginFun} className={button} loading={loading} disabled={loading}>
             Daxil ol
           </Button>
-          <Button onClick={readCardData} className={button} loading={cardLoading} disabled={cardLoading} style={{marginTop:'10px'}}>
+          {/* <Button onClick={readCardData} className={button} loading={cardLoading} disabled={cardLoading} style={{marginTop:'10px'}}>
             Kartla daxil ol
-          </Button>
+          </Button> */}
         </Form>
       </div>
     </div>

@@ -128,10 +128,12 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ fetchAnnouncements,
           >
             <Button icon={<UploadOutlined />}>Şəkil seç</Button>
           </Upload>
+          <div style={{display:'flex'}}  className={classes.imagePreviewContainer}>
 
           {newAnnouncement.images.map((image, index) => (
-            <div key={index} className={classes.imagePreviewContainer}>
+            <>
               <img 
+              style={{height:"100px", width:"100px"}}
                 src={URL.createObjectURL(image)} 
                 alt={`Image Preview ${index + 1}`} 
                 className={classes.imagePreview} 
@@ -143,8 +145,9 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ fetchAnnouncements,
               >
                 Sil
               </Button>
-            </div>
+              </>
           ))}
+            </div>
 
           <Form.Item>
             <Button style={{ marginTop: '20px' }} type="primary" htmlType="submit" className={classes.button} disabled={isSubmitting}>

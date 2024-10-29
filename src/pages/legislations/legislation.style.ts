@@ -3,13 +3,11 @@ import { createUseStyles } from 'react-jss';
 
 const styles = {
   legislationContainer: {
-    width:"100%",
-    // margin: '1500px auto',
+    // width:"100%",
     padding: '150px 40px 0 40px',
   },
   legislationButtons: {
     display: 'flex',
-    // justifyContent: 'space-between',
     gap:'20px',
     marginBottom: '2rem',
   },
@@ -44,12 +42,15 @@ const styles = {
     borderRadius: 8,
   },
   collapse: {
-    backgroundColor: '#ffffff',
+marginTop:'20px',
+    background: 'white',
+    borderRadius: 10,
+
   },
   panel: {
     marginBottom: 8,
     border: '1px solid #d9d9d9',
-    borderRadius: 4,
+    borderRadius: 10,
   },
   panelHeader: {
     display: 'flex',
@@ -67,7 +68,8 @@ const styles = {
   },
   collapseContentBox: {
     padding: 16,
-  },
+  }
+ 
 };
 
 export const useLegisStyle = createUseStyles(styles);

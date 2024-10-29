@@ -7,6 +7,7 @@
 }
 *{
     flex-wrap: wrap;
+    // overflow-x: hidden;
 }
 
 :where(.css-dev-only-do-not-override-19a7szb).ant-btn-default {
@@ -19,4 +20,10 @@
 }
 :where(.css-dev-only-do-not-override-19a7szb).ant-form-item .ant-form-item-control-input {
     width: 100%;
+}
+
+:where(.css-dev-only-do-not-override-19a7szb).ant-collapse>.ant-collapse-item >.ant-collapse-header {
+
+
+    align-items: center;
 }
